@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "pro.bananabanana/image-video",
   "title": "BananaBanana Image & Video Generation",
-  "description": "Pay-as-you-go image & video generation: Nano Banana, Veo, Omni. No subscription, pay with crypto.",
-  "version": "1.0.1",
+  "description": "Generate images & video (Nano Banana, Veo, Omni) pay-as-you-go. No subscription, crypto payments.",
+  "version": "1.0.2",
   "websiteUrl": "https://bananabanana.pro/mcp",
   "remotes": [
     {

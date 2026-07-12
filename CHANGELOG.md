@@ -4,6 +4,16 @@ All notable changes to the BananaBanana MCP server and this documentation are
 recorded here. The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and the server follows [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] — 2026-07-12
+
+### Changed
+
+- Reworded the server `description` in `server.json` to a clearer pay-as-you-go summary:
+  "Generate images & video (Nano Banana, Veo, Omni) pay-as-you-go. No subscription, crypto
+  payments." (kept within the registry's 100-character `description` limit). Republished to
+  the MCP Registry as 1.0.2 (now the latest version); 1.0.1 remains available but is no
+  longer latest.
+
 ## [1.0.1] — 2026-07-12
 
 ### Fixed
