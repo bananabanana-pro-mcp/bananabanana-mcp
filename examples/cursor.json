@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "bananabanana": {
+      "url": "https://bananabanana.pro/api/mcp",
+      "headers": {
+        "Authorization": "Bearer bb_live_YOUR_KEY"
+      }
+    }
+  }
+}

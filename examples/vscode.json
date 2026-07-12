@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "bananabanana": {
+      "type": "http",
+      "url": "https://bananabanana.pro/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:bb-api-key}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "bb-api-key",
+      "description": "BananaBanana API key (bb_live_…)",
+      "password": true
+    }
+  ]
+}

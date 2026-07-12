@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "pro.bananabanana/image-video",
+  "title": "BananaBanana Image & Video Generation",
+  "description": "Pay-as-you-go image & video generation: Nano Banana, Veo, Omni. No subscription, pay with crypto.",
+  "version": "1.0.1",
+  "websiteUrl": "https://bananabanana.pro/mcp",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://bananabanana.pro/api/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer API key in the form 'Bearer bb_live_…'. Create a key at https://bananabanana.pro/profile.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

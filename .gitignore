@@ -1,0 +1,12 @@
+# Secrets — never commit
+*.pem
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log

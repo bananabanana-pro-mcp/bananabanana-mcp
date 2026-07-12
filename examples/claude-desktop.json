@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "bananabanana": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://bananabanana.pro/api/mcp",
+        "--header",
+        "Authorization: Bearer bb_live_YOUR_KEY"
+      ]
+    }
+  }
+}
