@@ -4,6 +4,16 @@ All notable changes to the BananaBanana MCP server and this documentation are
 recorded here. The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and the server follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Docs: no-SDK usage guide [`examples/no-sdk.md`](./examples/no-sdk.md) — calling the
+  server as plain JSON-RPC over HTTPS from curl, Python and TypeScript, mirroring
+  <https://bananabanana.pro/mcp#code> — plus runnable scripts
+  [`examples/generate.py`](./examples/generate.py) and
+  [`examples/generate.mjs`](./examples/generate.mjs).
+
 ## [1.0.2] — 2026-07-12
 
 ### Changed

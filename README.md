@@ -92,6 +92,10 @@ Add this to `claude_desktop_config.json` (Settings → Developer → Edit Config
 Ready-to-copy configs live in [`examples/`](./examples). Once connected, ask your agent
 to run `list_models` (free) — it returns the live model list and prices.
 
+**No MCP client?** The server is plain JSON-RPC over HTTPS — call it from curl, Python
+or TypeScript with no SDK: [`examples/no-sdk.md`](./examples/no-sdk.md) (runnable
+scripts: [`generate.py`](./examples/generate.py), [`generate.mjs`](./examples/generate.mjs)).
+
 ## Tools
 
 Seven tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
