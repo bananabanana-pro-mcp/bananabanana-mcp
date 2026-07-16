@@ -4,10 +4,14 @@ All notable changes to the BananaBanana MCP server and this documentation are
 recorded here. The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and the server follows [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.0.3] — 2026-07-16
 
 ### Added
 
+- Server icon (512×512, [`assets/icon-512.png`](./assets/icon-512.png), hosted at
+  <https://bananabanana.pro/mcp-icon-512.png>) declared via the `icons` field of
+  `server.json`, so MCP directories and clients can display a logo. Republished to
+  the MCP Registry as 1.0.3 (latest); 1.0.2 deprecated, endpoint unchanged.
 - Docs: no-SDK usage guide [`examples/no-sdk.md`](./examples/no-sdk.md) — calling the
   server as plain JSON-RPC over HTTPS from curl, Python and TypeScript, mirroring
   <https://bananabanana.pro/mcp#code> — plus runnable scripts

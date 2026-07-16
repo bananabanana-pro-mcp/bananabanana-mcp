@@ -3,8 +3,15 @@
   "name": "pro.bananabanana/image-video",
   "title": "BananaBanana Image & Video Generation",
   "description": "Generate images & video (Nano Banana, Veo, Omni) pay-as-you-go. No subscription, crypto payments.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "websiteUrl": "https://bananabanana.pro/mcp",
+  "icons": [
+    {
+      "src": "https://bananabanana.pro/mcp-icon-512.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
