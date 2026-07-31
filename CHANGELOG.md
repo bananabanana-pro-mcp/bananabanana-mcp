@@ -4,6 +4,18 @@ All notable changes to the BananaBanana MCP server and this documentation are
 recorded here. The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and the server follows [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- New tool **`edit_video`** — video-to-video editing on Gemini Omni Flash: restyle,
+  replace objects or relight an existing clip while keeping its motion and
+  composition. The source is either a completed video on the account
+  (`source_generation_id`) or a public link (`video_url`); it is normalised to MP4
+  720p and the first 10 seconds (model limit). Flat $1.00 per edit with the usual
+  quote-then-`confirm_cost` flow and automatic refunds on failure.
+  Documented in [`docs/tools.md`](./docs/tools.md).
+
 ## [1.0.3] — 2026-07-16
 
 ### Added

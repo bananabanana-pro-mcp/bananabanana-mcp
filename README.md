@@ -98,7 +98,7 @@ scripts: [`generate.py`](./examples/generate.py), [`generate.mjs`](./examples/ge
 
 ## Tools
 
-Seven tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
+Eight tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
 
 | Tool | What it does | Key parameters |
 |---|---|---|
@@ -107,12 +107,13 @@ Seven tools; the read-only ones are free. Full reference in [`docs/tools.md`](./
 | `generate_image` | Text-to-image (Nano Banana 2 Lite / 2 / Pro), up to 4K, 1–4 variants. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `confirm_cost` |
 | `edit_image` | Multi-turn edit of a finished image by text instruction. | `source_generation_id`, `prompt`, `model`, `resolution` |
 | `generate_video` | Video (Veo 3.1 family or Omni Flash). Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `confirm_cost` |
+| `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `audio_prompt`, `confirm_cost` |
 | `get_result` | Poll a job; returns hosted media URLs (24 h) + cost/balance. Free. | `job_id`, `wait_seconds` |
 | `list_generations` | Recent account history (shared with the website). Free. | `limit`, `type`, `status` |
 
 Generation is async: a `generate_*` call returns a `job_id`; poll `get_result` for the
-media. `generate_video` and multi-image `generate_image` **quote first and charge
-nothing** until you repeat the call with `confirm_cost`.
+media. `generate_video`, `edit_video` and multi-image `generate_image` **quote first and
+charge nothing** until you repeat the call with `confirm_cost`.
 
 ## Pricing
 

@@ -55,7 +55,7 @@ native audio. Durations available via the API: **4, 6, 8 seconds**.
 
 | Model | Price | Notes |
 |---|---|---|
-| `omni-flash` | **$1.00 flat** | Always includes sound. 720p only. The model picks the clip duration (3–10 s) itself. Conversational editing of a finished clip costs the same flat price. |
+| `omni-flash` | **$1.00 flat** | Always includes sound. 720p only. The model picks the clip duration (3–10 s) itself. Conversational editing and video-to-video editing (`edit_video`) of an existing clip cost the same flat price. |
 
 **Overall ranges:** images **$0.03–$0.20**, video **$0.10–$4.40** per clip.
 
@@ -63,7 +63,7 @@ native audio. Durations available via the API: **4, 6, 8 seconds**.
 
 The server is built so an agent never spends by surprise:
 
-- **Quote-before-charge.** `generate_video` (always) and `generate_image` with
+- **Quote-before-charge.** `generate_video` and `edit_video` (always) and `generate_image` with
   `number_of_images > 1` return a `quoted_cost_usd` on the first call and charge
   nothing. You only start by repeating the call with `confirm_cost` set to that quote.
 - **Every result reports money.** Successful generations return `cost_charged_usd` and

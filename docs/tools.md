@@ -7,7 +7,7 @@ Generation is **asynchronous**: a `generate_*` / `edit_image` call charges (or q
 and returns a `job_id` with `status: "processing"`; you then poll `get_result` for the
 finished media URLs.
 
-**Cost confirmation is mandatory** for `generate_video` (always) and for
+**Cost confirmation is mandatory** for `generate_video` and `edit_video` (always) and for
 `generate_image` with `number_of_images > 1`. The first such call returns
 `status: "confirmation_required"` with a `quoted_cost_usd` and charges nothing — repeat
 the exact same call adding `confirm_cost` set to that quoted number to actually start.
@@ -20,8 +20,8 @@ for the live numbers rather than hard-coding them.
 ## Common concepts
 
 - **`job_id`** — id of a generation, returned by `generate_image` / `edit_image` /
-  `generate_video`. Pass it to `get_result`, or as `source_generation_id` /
-  `edit_from_generation_id`.
+  `generate_video` / `edit_video`. Pass it to `get_result`, or as
+  `source_generation_id` / `edit_from_generation_id`.
 - **`confirm_cost`** — the quoted USD number you accept. Omit to get a quote first.
 - **`idempotency_key`** — optional unique string (≤64 chars). Retries with the same key
   never double-charge; a repeat returns the original job.
@@ -229,6 +229,62 @@ to start. Returns a `job_id`; videos take **1–10+ minutes**.
 
 **Second call (start)** — same arguments plus `"confirm_cost": 0.70` → returns a
 `job_id` with `status: "processing"`.
+
+---
+
+## `edit_video`  — paid ($1.00 per clip, flat). Cost confirmation always required.
+
+Edit an **existing** video with Gemini Omni Flash (video-to-video): restyle it, replace
+or add objects, relight the scene, change the mood — the motion and composition of the
+source clip are preserved. The **first call always returns a quote and charges
+nothing** — repeat with `confirm_cost` to start. Returns a `job_id`; edits usually take
+1–3 minutes.
+
+The source is normalised server-side to MP4 720p and the **first 10 seconds** (model
+limit); the output is 720p with sound and keeps the aspect ratio of the source.
+
+| Parameter | Type | Default | Notes |
+|---|---|---|---|
+| `prompt` | string, ≤2000 | — | **Required.** What to change in the video. |
+| `source_generation_id` | string | — | `job_id` of a completed video on this account (see `list_generations`). Use this **or** `video_url`. |
+| `video_url` | string | — | Public http(s) link to the source clip (mp4/mov/webm/mkv, ≤200 MB). Private and internal addresses are rejected. |
+| `audio_prompt` | string, ≤500 | — | Describe the desired sound — Omni Flash always generates audio. |
+| `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
+| `idempotency_key` | string, ≤64 | — | Safe-retry key. |
+
+**First call (quote)**
+
+```json
+{
+  "name": "edit_video",
+  "arguments": {
+    "prompt": "make the whole scene look like a pencil sketch, keep the motion identical",
+    "source_generation_id": "cmxyz123..."
+  }
+}
+```
+
+```json
+{
+  "status": "confirmation_required",
+  "quoted_cost_usd": 1,
+  "model": "omni-flash",
+  "duration_seconds": "3–10 (model decides)",
+  "resolution": "720p",
+  "audio": true,
+  "balance_usd": 12.40,
+  "message": "This video edit costs $1.00. Nothing has been charged.",
+  "next_step": "Call edit_video again with the same arguments plus confirm_cost: 1."
+}
+```
+
+**Second call (start)** — same arguments plus `"confirm_cost": 1` → returns a `job_id`
+with `status: "processing"`.
+
+> `edit_video` rebuilds the clip from its pixels, so it works on any video you own or
+> can link to. For refining an **omni-flash** clip you generated moments ago, the
+> conversational `generate_video` + `edit_from_generation_id` path keeps the original
+> scene context and is usually the better choice.
 
 ---
 
