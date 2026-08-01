@@ -55,7 +55,7 @@ native audio. Durations available via the API: **4, 6, 8 seconds**.
 
 | Model | Price | Notes |
 |---|---|---|
-| `omni-flash` | **$1.00 flat** | Always includes sound. 720p only. The model picks the clip duration (3–10 s) itself. Conversational editing and video-to-video editing (`edit_video`) of an existing clip cost the same flat price. |
+| `omni-flash` | **$0.10 per second** ($0.30 – $1.00) | Always includes sound. 720p only. Duration is exact: 3–10 s, billed per second. Editing an existing clip costs the same per second — and its length always equals the source length (see `edit_video`). |
 
 **Overall ranges:** images **$0.03–$0.20**, video **$0.10–$4.40** per clip.
 

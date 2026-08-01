@@ -106,8 +106,8 @@ Eight tools; the read-only ones are free. Full reference in [`docs/tools.md`](./
 | `get_account` | Balance, key name, daily cap, spend today. Free. | — |
 | `generate_image` | Text-to-image (Nano Banana 2 Lite / 2 / Pro), up to 4K, 1–4 variants. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `confirm_cost` |
 | `edit_image` | Multi-turn edit of a finished image by text instruction. | `source_generation_id`, `prompt`, `model`, `resolution` |
-| `generate_video` | Video (Veo 3.1 family or Omni Flash). Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `confirm_cost` |
-| `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `audio_prompt`, `confirm_cost` |
+| `generate_video` | Video (Veo 3.1 family or Omni Flash), optionally from a start frame and reference images. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `first_frame`, `reference_images`, `confirm_cost` |
+| `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `duration`, `audio_prompt`, `confirm_cost` |
 | `get_result` | Poll a job; returns hosted media URLs (24 h) + cost/balance. Free. | `job_id`, `wait_seconds` |
 | `list_generations` | Recent account history (shared with the website). Free. | `limit`, `type`, `status` |
 
@@ -128,7 +128,7 @@ tables in [`docs/pricing.md`](./docs/pricing.md).
 | `veo-3.1-lite` | Video (720p/1080p, 4–8 s) | $0.10 – $0.56 |
 | `veo-3.1-fast` | Video (up to 4K, 4–8 s) | $0.35 – $2.60 |
 | `veo-3.1` | Video (up to 4K, 4–8 s) | $0.70 – $4.40 |
-| `omni-flash` | Video (720p, sound, 3–10 s) | $1.00 flat |
+| `omni-flash` | Video (720p, sound, 3–10 s) | $0.10 / s ($0.30 – $1.00) |
 
 Images **$0.03–$0.20**, video **$0.10–$4.40** per clip. Free reads: `list_models`,
 `get_account`, `get_result`, `list_generations`. Failed and content-filtered

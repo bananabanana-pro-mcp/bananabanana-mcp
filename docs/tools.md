@@ -188,14 +188,16 @@ to start. Returns a `job_id`; videos take **1–10+ minutes**.
 |---|---|---|---|
 | `prompt` | string, ≤2000 | — | **Required.** |
 | `model` | enum | `veo-3.1-fast` | `veo-3.1` (best Veo quality) · `veo-3.1-fast` (best value) · `veo-3.1-lite` (cheapest, no 4K) · `omni-flash` (always has sound, conversational editing). |
-| `duration` | enum `4`,`6`,`8` | `8` | Seconds. **Ignored by `omni-flash`** (the model picks 3–10 s itself). |
+| `duration` | enum `4`,`6`,`8` (Veo) · `3`–`10` (omni-flash) | `8` | Seconds. `omni-flash` accepts any value from 3 to 10 and is billed $0.10/s. Ignored together with `edit_from_generation_id` — a conversational edit always keeps the source clip's length. |
 | `resolution` | enum | `720p` | `720p`, `1080p`, `4k`. 4K only on `veo-3.1` / `veo-3.1-fast`; `omni-flash` is 720p only. |
 | `aspect_ratio` | enum | `16:9` | `16:9`, `9:16`. |
 | `with_audio` | boolean | `false` | Native audio for Veo (costs more). `omni-flash` always has audio. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound (used when audio is on). |
 | `negative_prompt` | string, ≤1000 | — | Veo. |
 | `seed` | integer 0–2147483647 | — | Veo only. |
-| `edit_from_generation_id` | string | — | **`omni-flash` only:** `job_id` of a completed omni video to refine conversationally; `prompt` describes the changes. |
+| `first_frame` | string | — | Animate a still image: the `job_id` of a completed image generation on this account, **or** a public http(s) image URL (a signed `get_result` URL works — that is how you pick one variant of a multi-image job). On `omni-flash` it combines with `reference_images`; on Veo it is either/or. |
+| `reference_images` | string[], ≤10 | — | Reference images that keep a subject, character or style consistent — they are **not** used as literal frames. Same forms as `first_frame` (`job_id` or public URL). `omni-flash`: up to 10 images in total together with `first_frame`. Veo: at most 3, only with `duration: 8` and without `first_frame`. |
+| `edit_from_generation_id` | string | — | **`omni-flash` only:** `job_id` of a completed omni video to refine conversationally; `prompt` describes the changes. Duration, aspect ratio and scene context are inherited from that clip. |
 | `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
 
@@ -230,9 +232,31 @@ to start. Returns a `job_id`; videos take **1–10+ minutes**.
 **Second call (start)** — same arguments plus `"confirm_cost": 0.70` → returns a
 `job_id` with `status: "processing"`.
 
+**Image inputs** — animate a picture you already generated and keep a character
+consistent, without uploading base64 anywhere:
+
+```json
+{
+  "name": "generate_video",
+  "arguments": {
+    "prompt": "the mascot walks toward camera through falling snow, single unbroken shot",
+    "model": "omni-flash",
+    "duration": 6,
+    "first_frame": "cmx_image_job_id",
+    "reference_images": ["cmx_other_image_job_id", "https://example.com/mascot-side.png"],
+    "confirm_cost": 0.60
+  }
+}
+```
+
+Images are fetched server-side and downscaled before they reach the model; private
+and internal addresses are rejected. The quote echoes `input_images` so you can see
+how many were accepted. Editing modes (`edit_from_generation_id`, `edit_video`) take
+their context from the source clip and ignore image inputs.
+
 ---
 
-## `edit_video`  — paid ($1.00 per clip, flat). Cost confirmation always required.
+## `edit_video`  — paid ($0.10 per second of output). Cost confirmation always required.
 
 Edit an **existing** video with Gemini Omni Flash (video-to-video): restyle it, replace
 or add objects, relight the scene, change the mood — the motion and composition of the
@@ -243,11 +267,19 @@ nothing** — repeat with `confirm_cost` to start. Returns a `job_id`; edits usu
 The source is normalised server-side to MP4 720p and the **first 10 seconds** (model
 limit); the output is 720p with sound and keeps the aspect ratio of the source.
 
+**The edited clip is always exactly as long as the source** — the model cannot stretch
+or shorten a video. `duration` therefore works only downwards: it trims the source to
+its first N seconds and you pay for those N seconds only. Omit it to edit the whole
+clip; the quote reports the resolved `duration_seconds` and `source_duration_seconds`.
+Clips shorter than 3 seconds are rejected.
+
 | Parameter | Type | Default | Notes |
 |---|---|---|---|
 | `prompt` | string, ≤2000 | — | **Required.** What to change in the video. |
 | `source_generation_id` | string | — | `job_id` of a completed video on this account (see `list_generations`). Use this **or** `video_url`. |
 | `video_url` | string | — | Public http(s) link to the source clip (mp4/mov/webm/mkv, ≤200 MB). Private and internal addresses are rejected. |
+| `source_ref` | string | — | Returned by the quote when `video_url` was used. Pass it back with `confirm_cost` to reuse the already downloaded clip instead of downloading it again. |
+| `duration` | integer 3–10 | source length | Trim the source to its first N seconds and edit only that part ($0.10/s). Values above the source length are ignored — a clip cannot be made longer. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound — Omni Flash always generates audio. |
 | `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
@@ -267,18 +299,19 @@ limit); the output is 720p with sound and keeps the aspect ratio of the source.
 ```json
 {
   "status": "confirmation_required",
-  "quoted_cost_usd": 1,
+  "quoted_cost_usd": 0.80,
   "model": "omni-flash",
-  "duration_seconds": "3–10 (model decides)",
+  "duration_seconds": 8,
+  "source_duration_seconds": 8,
   "resolution": "720p",
   "audio": true,
   "balance_usd": 12.40,
-  "message": "This video edit costs $1.00. Nothing has been charged.",
-  "next_step": "Call edit_video again with the same arguments plus confirm_cost: 1."
+  "message": "This video edit costs $0.80. Nothing has been charged.",
+  "next_step": "Call edit_video again with the same arguments plus confirm_cost: 0.8."
 }
 ```
 
-**Second call (start)** — same arguments plus `"confirm_cost": 1` → returns a `job_id`
+**Second call (start)** — same arguments plus `"confirm_cost": 0.8` → returns a `job_id`
 with `status: "processing"`.
 
 > `edit_video` rebuilds the clip from its pixels, so it works on any video you own or
