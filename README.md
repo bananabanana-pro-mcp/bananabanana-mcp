@@ -3,7 +3,7 @@
 An MCP server for **image generation** and **video generation** — Google **Nano Banana**, **Veo**, and **Omni** models — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto payments** and **no subscription**.
 
 - **Endpoint:** `https://bananabanana.pro/api/mcp` (streamable HTTP)
-- **Auth:** `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile)
+- **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile)
 - **Website:** <https://bananabanana.pro> · **Docs & live example:** <https://bananabanana.pro/mcp>
 
 Generate images from $0.03 and videos from $0.10, billed per generation from an account
@@ -12,14 +12,32 @@ call, automatic refunds on failure, and one shared history with the website.
 
 ## Quick Start
 
-First, create an API key in your profile: <https://bananabanana.pro/profile>
-(API Keys section). Then add the server to your client.
+Two ways to authenticate — pick whichever your client supports:
+
+- **OAuth 2.1** (claude.ai, Claude Desktop, Claude mobile, Claude Code, MCP Inspector):
+  add a custom connector with the URL above, press Connect and approve access. No key
+  to copy. See [docs/authentication.md](./docs/authentication.md).
+- **API key** (Cursor, VS Code, Windsurf, Codex, scripts): create a key in your
+  profile — <https://bananabanana.pro/profile>, API Keys section — and put it in the
+  client config as shown below.
+
+### claude.ai / Claude Desktop / mobile (OAuth)
+
+```
+Settings → Connectors → Add custom connector
+URL: https://bananabanana.pro/api/mcp
+→ Add → Connect → approve access on bananabanana.pro
+```
 
 ### Claude Code
 
 ```bash
+# with an API key
 claude mcp add --transport http bananabanana https://bananabanana.pro/api/mcp \
   --header "Authorization: Bearer bb_live_YOUR_KEY"
+
+# or with OAuth — no key; run /mcp inside Claude Code and choose "Authenticate"
+claude mcp add --transport http bananabanana https://bananabanana.pro/api/mcp
 ```
 
 ### Claude Desktop

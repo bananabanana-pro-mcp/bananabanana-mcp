@@ -8,6 +8,20 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **OAuth 2.1 sign-in** alongside API keys. The server is now a full OAuth
+  authorization server for its own MCP endpoint: PKCE (S256), dynamic client
+  registration (RFC 7591), protected resource metadata (RFC 9728), authorization
+  server metadata (RFC 8414) and resource indicators (RFC 8707). Connector-style
+  clients — claude.ai, Claude Desktop, Claude mobile, Claude Code, MCP Inspector —
+  connect by pasting `https://bananabanana.pro/api/mcp` and signing in; there is no
+  key to copy. Access tokens live one hour, refresh tokens rotate on every use, and
+  connected apps can be disconnected from the profile at any time.
+  Documented in [`docs/authentication.md`](./docs/authentication.md).
+- **Lazy authentication.** `initialize`, `ping` and `tools/list` answer without
+  credentials so a client can inspect the tool catalogue before signing in; a
+  `tools/call` without a valid token returns `401` with
+  `WWW-Authenticate: Bearer …, resource_metadata="…"`, which is what starts the
+  OAuth flow.
 - New tool **`edit_video`** — video-to-video editing on Gemini Omni Flash: restyle,
   replace objects or relight an existing clip while keeping its motion and
   composition. The source is either a completed video on the account

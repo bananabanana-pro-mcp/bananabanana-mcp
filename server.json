@@ -3,13 +3,19 @@
   "name": "pro.bananabanana/image-video",
   "title": "BananaBanana Image & Video Generation",
   "description": "Generate images & video (Nano Banana, Veo, Omni) pay-as-you-go. No subscription, crypto payments.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "websiteUrl": "https://bananabanana.pro/mcp",
+  "repository": {
+    "url": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
+    "source": "github"
+  },
   "icons": [
     {
       "src": "https://bananabanana.pro/mcp-icon-512.png",
       "mimeType": "image/png",
-      "sizes": ["512x512"]
+      "sizes": [
+        "512x512"
+      ]
     }
   ],
   "remotes": [
@@ -19,8 +25,8 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Bearer API key in the form 'Bearer bb_live_…'. Create a key at https://bananabanana.pro/profile.",
-          "isRequired": true,
+          "description": "Bearer credential. Leave empty if your client signs in with OAuth 2.1 (claude.ai, Claude Desktop/Code, MCP Inspector) — it obtains the token itself. Otherwise put an API key here as 'Bearer bb_live_…'; create one at https://bananabanana.pro/profile.",
+          "isRequired": false,
           "isSecret": true
         }
       ]

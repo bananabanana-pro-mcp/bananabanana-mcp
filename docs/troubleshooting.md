@@ -15,14 +15,24 @@ Two layers can return errors:
 { "jsonrpc": "2.0", "id": null, "error": { "code": -32001, "message": "..." } }
 ```
 
-The response also carries `WWW-Authenticate: Bearer`. Causes:
+The response also carries `WWW-Authenticate: Bearer …, resource_metadata="…"` — an
+OAuth-capable client uses that pointer to start the sign-in flow. Causes:
 
 - **No `Authorization` header** or it doesn't start with `Bearer `.
 - **Malformed key.** Keys are `bb_live_` + 40 hex chars. Check for stray spaces,
   quotes or a truncated copy-paste.
 - **Unknown or revoked key.** Create a fresh key at
   <https://bananabanana.pro/profile> and update your client config.
+- **Expired OAuth access token.** Tokens live one hour; refresh with the refresh
+  token (clients do this automatically). If the refresh fails with `invalid_grant`,
+  reconnect the app.
+- **Disconnected OAuth app.** Disconnecting it in the profile revokes its tokens —
+  connect again.
 - **Account blocked.** Contact support@bananabanana.pro.
+
+Note that `initialize`, `ping` and `tools/list` answer *without* credentials, so a
+successful `tools/list` does not prove your credential works — test with a tool call
+such as `list_models` (free).
 
 Verify quickly:
 
