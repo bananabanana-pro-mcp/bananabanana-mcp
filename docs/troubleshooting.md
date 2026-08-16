@@ -83,7 +83,7 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 | `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Top up at the profile, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
 | `RATE_LIMITED` | Too many tool calls this minute. | Wait ~1 minute and retry. |
-| `SAFETY_FILTERED` | Google's content filter rejected the prompt/output (auto-refunded). | Rephrase to avoid people-likeness, violence, brands/characters or other sensitive content. |
+| `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images and Veo video; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag changes nothing and only a different prompt helps. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
 | `UPSTREAM_FAILED` | Upstream overloaded, out of quota, timed out, or an expired edit source (auto-refunded). | Retry in a minute or two; for edits, generate a fresh video; try a lower resolution or another model. |
 | `ACCOUNT_BLOCKED` | Account is blocked. | Contact support@bananabanana.pro. |
 | `MAINTENANCE` | Service under maintenance. | Retry in a few minutes. |
@@ -92,6 +92,30 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 Charges for `SAFETY_FILTERED` and `UPSTREAM_FAILED` failures are **refunded
 automatically** — the `get_result` payload shows `refunded: true` and the restored
 `balance_usd`.
+
+## Two filter stages, and what `relaxed_filter` actually does
+
+Google applies **two independent filters** to every generation, and only the first
+one is configurable:
+
+| Stage | When it runs | Typical `upstream_reason` | Configurable? |
+|---|---|---|---|
+| **1. Request filter** | Before anything is rendered — screens the prompt and any input images. | `SAFETY_BLOCK` (images), prompt-level RAI rejection (Veo) | **Yes** — this is the stage `relaxed_filter: true` loosens (safety thresholds → OFF, `personGeneration` → adults allowed). |
+| **2. Output filter** | After the media exists — a classifier inspects the finished image/clip and decides whether to release it. | `IMAGE_SAFETY` (images), `rai_media_filtered_reasons` (Veo) | **No** — no API parameter disables it; it runs identically with `relaxed_filter: true`. |
+
+Practical consequences:
+
+- `relaxed_filter` is the right retry when the request never made it to the model —
+  legitimate prompts about real-looking people, medical or anatomical subjects, mild
+  fictional violence, edgy artwork.
+- Retrying an `IMAGE_SAFETY` failure with `relaxed_filter: true` will fail the same
+  way. The image was already produced and rejected on its own merits; only changing
+  the prompt (less person-centric, less anatomically explicit, less likeness-specific)
+  changes the outcome.
+- Neither stage can be bought around: sexual content, minors, real public figures and
+  extreme gore stay blocked upstream regardless of the flag.
+- Both stages surface as `error_code: "SAFETY_FILTERED"` and both are fully refunded —
+  `upstream_reason` is what tells them apart.
 
 ## Video jobs
 

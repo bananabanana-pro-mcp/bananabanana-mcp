@@ -101,6 +101,7 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
 | `negative_prompt` | string, ≤1000 | — | What to avoid. |
 | `output_format` | enum | `jpeg` | `jpeg`, `png`, `webp`. |
 | `seed` | integer 0–2147483647 | — | For reproducible results. |
+| `relaxed_filter` | boolean | `false` | Loosens the **configurable** stage of Google's content filter for this call (safety thresholds off, adult person generation allowed). It relaxes the check applied to the request *before* generation — the standard retry after a `SAFETY_FILTERED` failure with `upstream_reason: "SAFETY_BLOCK"`. The classifier that inspects the finished image (`upstream_reason: "IMAGE_SAFETY"`) is not configurable and stays active, so it never unlocks content Google refuses to release. See [Two filter stages](troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does). |
 | `confirm_cost` | number | — | Required for batches: the quoted total USD you accept. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
 
@@ -197,6 +198,7 @@ to start. Returns a `job_id`; videos take **1–10+ minutes**.
 | `seed` | integer 0–2147483647 | — | Veo only. |
 | `first_frame` | string | — | Animate a still image: the `job_id` of a completed image generation on this account, **or** a public http(s) image URL (a signed `get_result` URL works — that is how you pick one variant of a multi-image job). On `omni-flash` it combines with `reference_images`; on Veo it is either/or. |
 | `reference_images` | string[], ≤10 | — | Reference images that keep a subject, character or style consistent — they are **not** used as literal frames. Same forms as `first_frame` (`job_id` or public URL). `omni-flash`: up to 10 images in total together with `first_frame`. Veo: at most 3, only with `duration: 8` and without `first_frame`. |
+| `relaxed_filter` | boolean | `false` | **Veo only** (`omni-flash` ignores it): allows adult person generation. Retry with this after a `SAFETY_FILTERED` failure on people-heavy prompts that were rejected *before* rendering. The filter applied to the finished clip (`rai_media_filtered_reasons`) is not configurable and keeps running. See [Two filter stages](troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does). |
 | `edit_from_generation_id` | string | — | **`omni-flash` only:** `job_id` of a completed omni video to refine conversationally; `prompt` describes the changes. Duration, aspect ratio and scene context are inherited from that clip. |
 | `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |

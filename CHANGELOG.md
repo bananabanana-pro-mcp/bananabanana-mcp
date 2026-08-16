@@ -6,6 +6,23 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.5] — 2026-08-16
+
+### Changed
+
+- **`relaxed_filter` is now documented for what it actually does.** Google applies two
+  independent filters: a configurable check on the request *before* generation, and a
+  non-configurable classifier that inspects the finished image or clip. `relaxed_filter`
+  only loosens the first one. Tool descriptions, the `list_models` content-filter note
+  and the `get_result` failure guidance now state this explicitly, report the stage that
+  fired via `upstream_reason` (`SAFETY_BLOCK` = request stage, `IMAGE_SAFETY` /
+  `rai_media_filtered_reasons` = output stage), and no longer suggest retrying an
+  output-stage rejection with the flag — that retry costs time and always fails the same
+  way. New reference section:
+  [Two filter stages](./docs/troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does).
+
+## [1.0.4] — 2026-08-01
+
 ### Added
 
 - **OAuth 2.1 sign-in** alongside API keys. The server is now a full OAuth
