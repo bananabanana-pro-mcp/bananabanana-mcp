@@ -14,12 +14,18 @@ and the server follows [Semantic Versioning](https://semver.org/).
   independent filters: a configurable check on the request *before* generation, and a
   non-configurable classifier that inspects the finished image or clip. `relaxed_filter`
   only loosens the first one. Tool descriptions, the `list_models` content-filter note
-  and the `get_result` failure guidance now state this explicitly, report the stage that
+  and the `get_result` failure guidance now state this explicitly and report which stage
   fired via `upstream_reason` (`SAFETY_BLOCK` = request stage, `IMAGE_SAFETY` /
-  `rai_media_filtered_reasons` = output stage), and no longer suggest retrying an
-  output-stage rejection with the flag — that retry costs time and always fails the same
-  way. New reference section:
+  `rai_media_filtered_reasons` = output stage). The output classifier scores each
+  rendered file on its own, so a retry on a borderline subject is still worth taking —
+  the guidance recommends it, while making clear the flag is not what unlocks that
+  stage. New reference section:
   [Two filter stages](./docs/troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does).
+- **`relaxed_filter` on video is documented as near-inert.** Google exposes no
+  configurable safety settings for Veo; the flag can only pin
+  `personGeneration=allow_adult`, which is already the Veo 3.1 default. `generate_video`
+  still accepts it, and the tool text now points at the levers that do work for video:
+  a retry, the wording, and `veo-3.1-fast` over `omni-flash`.
 
 ## [1.0.4] — 2026-08-01
 

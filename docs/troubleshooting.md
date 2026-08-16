@@ -83,7 +83,7 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 | `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Top up at the profile, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
 | `RATE_LIMITED` | Too many tool calls this minute. | Wait ~1 minute and retry. |
-| `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images and Veo video; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag changes nothing and only a different prompt helps. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
+| `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
 | `UPSTREAM_FAILED` | Upstream overloaded, out of quota, timed out, or an expired edit source (auto-refunded). | Retry in a minute or two; for edits, generate a fresh video; try a lower resolution or another model. |
 | `ACCOUNT_BLOCKED` | Account is blocked. | Contact support@bananabanana.pro. |
 | `MAINTENANCE` | Service under maintenance. | Retry in a few minutes. |
@@ -101,19 +101,28 @@ one is configurable:
 | Stage | When it runs | Typical `upstream_reason` | Configurable? |
 |---|---|---|---|
 | **1. Request filter** | Before anything is rendered — screens the prompt and any input images. | `SAFETY_BLOCK` (images), prompt-level RAI rejection (Veo) | **Yes** — this is the stage `relaxed_filter: true` loosens (safety thresholds → OFF, `personGeneration` → adults allowed). |
-| **2. Output filter** | After the media exists — a classifier inspects the finished image/clip and decides whether to release it. | `IMAGE_SAFETY` (images), `rai_media_filtered_reasons` (Veo) | **No** — no API parameter disables it; it runs identically with `relaxed_filter: true`. |
+| **2. Output filter** | After the media exists — a classifier inspects the finished image/clip and decides whether to release it. | `IMAGE_SAFETY` (images), `rai_media_filtered_reasons` (Veo) | **No** — no API parameter disables it; it runs identically with `relaxed_filter: true`. It scores each rendered file on its own, so its verdict varies between attempts on the same prompt. |
 
 Practical consequences:
 
 - `relaxed_filter` is the right retry when the request never made it to the model —
-  legitimate prompts about real-looking people, medical or anatomical subjects, mild
-  fictional violence, edgy artwork.
-- Retrying an `IMAGE_SAFETY` failure with `relaxed_filter: true` will fail the same
-  way. The image was already produced and rejected on its own merits; only changing
-  the prompt (less person-centric, less anatomically explicit, less likeness-specific)
-  changes the outcome.
-- Neither stage can be bought around: sexual content, minors, real public figures and
-  extreme gore stay blocked upstream regardless of the flag.
+  legitimate prompts about real-looking people, swimwear or sportswear, medical and
+  anatomical subjects, mild fictional violence, edgy artwork.
+- **After an `IMAGE_SAFETY` failure, retry anyway — just not because of the flag.**
+  Stage 2 scores the pixels it was handed, and every attempt renders a different
+  image, so borderline-but-legitimate subjects frequently pass on the second or third
+  try. Failed generations are fully refunded, so an attempt costs time, not money.
+  What the flag does *not* do is bypass that stage, so don't treat toggling it on as
+  the fix.
+- **Nudging the wording helps more than the flag** at stage 2: same idea, less
+  ambiguous framing (more coverage, less close-up anatomy, no specific real person).
+- **On video the flag barely matters.** Google exposes no configurable safety settings
+  for Veo at all — `relaxed_filter` can only pin `personGeneration=allow_adult`, which
+  is already the default for Veo 3.1. There the working levers are a retry, the
+  wording, and the model: `omni-flash` filters video hardest, `veo-3.1-fast` is
+  noticeably more permissive with people and real-looking scenes.
+- Content Google refuses outright — sexual content, minors, real public figures — stays
+  blocked on every attempt, with or without the flag.
 - Both stages surface as `error_code: "SAFETY_FILTERED"` and both are fully refunded —
   `upstream_reason` is what tells them apart.
 
