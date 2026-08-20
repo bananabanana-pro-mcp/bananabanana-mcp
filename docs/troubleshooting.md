@@ -19,13 +19,12 @@ The response also carries `WWW-Authenticate: Bearer …, resource_metadata="…"
 OAuth-capable client uses that pointer to start the sign-in flow. Causes:
 
 - **No `Authorization` header** or it doesn't start with `Bearer `.
-- **Malformed key.** Keys are `bb_live_` + 40 hex chars. Check for stray spaces,
-  quotes or a truncated copy-paste.
+- **Malformed key.** Keys start with `bb_live_`. Check for stray spaces, quotes or a
+  truncated copy-paste.
 - **Unknown or revoked key.** Create a fresh key at
   <https://bananabanana.pro/profile> and update your client config.
-- **Expired OAuth access token.** Tokens live one hour; refresh with the refresh
-  token (clients do this automatically). If the refresh fails with `invalid_grant`,
-  reconnect the app.
+- **Expired OAuth access token.** OAuth-capable clients refresh tokens automatically.
+  If refresh fails with `invalid_grant`, reconnect the app.
 - **Disconnected OAuth app.** Disconnecting it in the profile revokes its tokens —
   connect again.
 - **Account blocked.** Contact support@bananabanana.pro.
@@ -67,10 +66,24 @@ client misconfiguration.
 { "jsonrpc": "2.0", "id": null, "error": { "code": -32002, "message": "Rate limit exceeded. Wait a minute and retry." } }
 ```
 
-Sent with `Retry-After: 60`. There is also a tool-level limit — a `tools/call` may
-return `error_code: "RATE_LIMITED"` when the **20 tool calls/min per key** ceiling is
-hit. Back off ~1 minute, or spread work across keys. Video has a tighter internal
-burst limit than images.
+Follow `Retry-After` when the response provides it. A `tools/call` may instead return
+`error_code: "RATE_LIMITED"`. Stop polling or submitting new jobs, wait for the
+indicated interval, then retry with backoff. Do not immediately fan retries out across
+multiple credentials.
+
+## Balance and spend caps
+
+### `INSUFFICIENT_BALANCE`
+
+The quote or generation costs more than the available account balance. Top up at
+<https://bananabanana.pro/profile>, then repeat the original call. If the tool requires
+cost confirmation, request a fresh quote before sending `confirm_cost` again.
+
+### `DAILY_CAP_EXCEEDED`
+
+The credential has reached its optional daily USD spend cap. The account can still
+use free read tools. Wait for the next UTC day or change the cap in the profile before
+retrying a paid tool; adding balance does not reset the cap.
 
 ## Tool error codes
 
@@ -78,11 +91,11 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 
 | `error_code` | Meaning | What to do |
 |---|---|---|
-| `INVALID_PARAMS` | Bad/again incompatible arguments (e.g. 512 on a model that has no 512). | Fix params; check `list_models` for valid combinations. |
+| `INVALID_PARAMS` | Bad or incompatible arguments (e.g. 512 on a model that has no 512). | Fix params; check `list_models` for valid combinations. |
 | `NOT_FOUND` | No such `job_id` / `source_generation_id` for this account. | Verify the id with `list_generations`. |
 | `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Top up at the profile, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
-| `RATE_LIMITED` | Too many tool calls this minute. | Wait ~1 minute and retry. |
+| `RATE_LIMITED` | Too many tool calls. | Respect `Retry-After` when present and retry with backoff. |
 | `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
 | `UPSTREAM_FAILED` | Upstream overloaded, out of quota, timed out, or an expired edit source (auto-refunded). | Retry in a minute or two; for edits, generate a fresh video; try a lower resolution or another model. |
 | `ACCOUNT_BLOCKED` | Account is blocked. | Contact support@bananabanana.pro. |
@@ -130,8 +143,8 @@ Practical consequences:
 
 Videos are the slowest and most failure-prone path — plan for polling.
 
-- **Expect 1–10+ minutes.** `generate_video` returns a `job_id` immediately; the clip
-  is not ready yet.
+- **Expect 1–10+ minutes.** `generate_video` returns a `job_id` after cost
+  confirmation; the clip is not ready yet.
 - **Poll `get_result`** roughly every **10–15 seconds**, using `wait_seconds` (up to
   30) so each call long-polls instead of returning instantly.
 - **`status: "processing"` is normal** for a while. If the payload includes a
@@ -140,10 +153,9 @@ Videos are the slowest and most failure-prone path — plan for polling.
 - **A video that fails is auto-refunded.** You'll see `status: "failed"`,
   `refunded: true` and an `error_code` (usually `UPSTREAM_FAILED` or
   `SAFETY_FILTERED`).
-- **"It's taking too long."** Keep polling — long clips, 4K and audio take longer. If a
-  single job runs well beyond ~25 minutes without completing, it will end as `failed`
-  and be refunded; start a new job, optionally at a lower resolution or with
-  `veo-3.1-fast`.
+- **"It's taking too long."** Keep polling — long clips, 4K and audio take longer. If
+  the job eventually fails, it is refunded; start a new job, optionally at a lower
+  resolution or with `veo-3.1-fast`.
 - **Editing an old omni clip returns `UPSTREAM_FAILED` / expired.** The source
   interaction expired upstream — generate a fresh video instead of editing.
 

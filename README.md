@@ -1,23 +1,25 @@
 # BananaBanana MCP Server
 
-An MCP server for **image generation** and **video generation** — Google **Nano Banana**, **Veo**, and **Omni** models — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto payments** and **no subscription**.
+An MCP server for **image, video, and speech generation** — Google **Nano Banana**, **Veo**, **Omni**, and **Gemini TTS** models — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto payments** and **no subscription**.
 
 - **Endpoint:** `https://bananabanana.pro/api/mcp` (streamable HTTP)
 - **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile)
 - **Website:** <https://bananabanana.pro> · **Docs & live example:** <https://bananabanana.pro/mcp>
 
-Generate images from $0.03 and videos from $0.10, billed per generation from an account
-balance you top up with crypto or Telegram Stars. Cost quotes before every expensive
-call, automatic refunds on failure, and one shared history with the website.
+Generate images from $0.03, videos from $0.10, and speech for $0.01 per started 200
+transcript characters, billed from an account balance you top up with crypto. Cost
+quotes before every expensive call, automatic refunds on failure, and one shared
+image/video history with the website.
 
 ## Quick Start
 
-Two ways to authenticate — pick whichever your client supports:
+OAuth is the primary connection path. API keys remain available for clients without
+OAuth and for scripts or CI:
 
 - **OAuth 2.1** (claude.ai, Claude Desktop, Claude mobile, Claude Code, MCP Inspector):
   add a custom connector with the URL above, press Connect and approve access. No key
   to copy. See [docs/authentication.md](./docs/authentication.md).
-- **API key** (Cursor, VS Code, Windsurf, Codex, scripts): create a key in your
+- **API key** (Cursor, VS Code, Windsurf, Codex, scripts, CI): create a key in your
   profile — <https://bananabanana.pro/profile>, API Keys section — and put it in the
   client config as shown below.
 
@@ -32,18 +34,20 @@ URL: https://bananabanana.pro/api/mcp
 ### Claude Code
 
 ```bash
-# with an API key
+# OAuth — no key; run /mcp inside Claude Code and choose "Authenticate"
+claude mcp add --transport http bananabanana https://bananabanana.pro/api/mcp
+
+# API-key fallback for non-interactive use
 claude mcp add --transport http bananabanana https://bananabanana.pro/api/mcp \
   --header "Authorization: Bearer bb_live_YOUR_KEY"
-
-# or with OAuth — no key; run /mcp inside Claude Code and choose "Authenticate"
-claude mcp add --transport http bananabanana https://bananabanana.pro/api/mcp
 ```
 
 ### Claude Desktop
 
-Add this to `claude_desktop_config.json` (Settings → Developer → Edit Config). Requires
-[Node.js](https://nodejs.org) for the `mcp-remote` bridge:
+Use **Settings → Connectors → Add custom connector** and enter
+`https://bananabanana.pro/api/mcp`, then press **Connect** and approve access. If your
+Desktop build uses `claude_desktop_config.json`, the OAuth-capable `mcp-remote` bridge
+requires [Node.js](https://nodejs.org):
 
 ```json
 {
@@ -51,13 +55,15 @@ Add this to `claude_desktop_config.json` (Settings → Developer → Edit Config
     "bananabanana": {
       "command": "npx",
       "args": [
-        "-y", "mcp-remote", "https://bananabanana.pro/api/mcp",
-        "--header", "Authorization: Bearer bb_live_YOUR_KEY"
+        "-y", "mcp-remote", "https://bananabanana.pro/api/mcp"
       ]
     }
   }
 }
 ```
+
+The bridge opens the OAuth sign-in flow on first use. See
+[`docs/authentication.md`](./docs/authentication.md) for the API-key fallback.
 
 <details>
 <summary><b>Other clients (Cursor, VS Code, Windsurf)</b></summary>
@@ -116,7 +122,7 @@ scripts: [`generate.py`](./examples/generate.py), [`generate.mjs`](./examples/ge
 
 ## Tools
 
-Eight tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
+Nine tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
 
 | Tool | What it does | Key parameters |
 |---|---|---|
@@ -126,31 +132,42 @@ Eight tools; the read-only ones are free. Full reference in [`docs/tools.md`](./
 | `edit_image` | Multi-turn edit of a finished image by text instruction. | `source_generation_id`, `prompt`, `model`, `resolution` |
 | `generate_video` | Video (Veo 3.1 family or Omni Flash), optionally from a start frame and reference images. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `first_frame`, `reference_images`, `confirm_cost` |
 | `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `duration`, `audio_prompt`, `confirm_cost` |
+| `generate_speech` | Gemini 3.1 Flash TTS speech: one speaker or a two-speaker dialogue. Returns a hosted WAV URL synchronously. | `text`, `voice`, `language_code`, `style`, `speakers` |
 | `get_result` | Poll a job; returns hosted media URLs (24 h) + cost/balance. Free. | `job_id`, `wait_seconds` |
 | `list_generations` | Recent account history (shared with the website). Free. | `limit`, `type`, `status` |
 
-Generation is async: a `generate_*` call returns a `job_id`; poll `get_result` for the
-media. `generate_video`, `edit_video` and multi-image `generate_image` **quote first and
-charge nothing** until you repeat the call with `confirm_cost`.
+Image and video generation is async: generation/editing calls return a `job_id`; poll
+`get_result` for the media. `generate_speech` is synchronous and returns its WAV URL
+directly. `generate_video`, `edit_video` and multi-image `generate_image` **quote first
+and charge nothing** until you repeat the call with `confirm_cost`.
 
 ## Pricing
 
-Pay-as-you-go, per generated item (USD). Live numbers come from `list_models`; full
-tables in [`docs/pricing.md`](./docs/pricing.md).
+Pay-as-you-go in USD: per image, per Veo clip, per second for Omni Flash, and per
+started 200 transcript characters for speech. Live numbers come from `list_models`;
+full tables in [`docs/pricing.md`](./docs/pricing.md).
 
 | Model | Type | Price |
 |---|---|---|
 | `nano-banana-2-lite` | Image (1024) | $0.03 |
 | `nano-banana-2` | Image (512→4096) | $0.03 – $0.13 |
 | `nano-banana-pro` | Image (1024→4096) | $0.11 – $0.20 |
-| `veo-3.1-lite` | Video (720p/1080p, 4–8 s) | $0.10 – $0.56 |
-| `veo-3.1-fast` | Video (up to 4K, 4–8 s) | $0.35 – $2.60 |
-| `veo-3.1` | Video (up to 4K, 4–8 s) | $0.70 – $4.40 |
+| `veo-3.1-lite` | Video (720p/1080p; 4, 6 or 8 s) | $0.10 – $0.56 |
+| `veo-3.1-fast` | Video (up to 4K; 4, 6 or 8 s) | $0.35 – $2.60 |
+| `veo-3.1` | Video (up to 4K; 4, 6 or 8 s) | $0.70 – $4.40 |
 | `omni-flash` | Video (720p, sound, 3–10 s) | $0.10 / s ($0.30 – $1.00) |
+| `gemini-3.1-flash-tts-preview` | Speech (WAV) | $0.01 / started 200 transcript characters |
 
-Images **$0.03–$0.20**, video **$0.10–$4.40** per clip. Free reads: `list_models`,
-`get_account`, `get_result`, `list_generations`. Failed and content-filtered
-generations are refunded automatically.
+Images cost **$0.03–$0.20** each; video costs **$0.10–$4.40** per clip, with Omni
+Flash billed at **$0.10/s**. Veo generation accepts 4, 6 or 8 seconds; the 7-second
+prices returned by `list_models` are for extension jobs, not a selectable
+`generate_video` duration. Free reads: `list_models`, `get_account`, `get_result`,
+`list_generations`. Failed and content-filtered generations are refunded automatically.
+
+Top-up bonuses can lower the effective cost: deposits of $50+ receive 5% extra
+balance, deposits of $100+ receive 10%, and an active partner promo code adds another
+10%. Bonuses stack. The table shows nominal generation charges; effective
+out-of-pocket cost depends on the top-up bonus.
 
 ## Why this instead of a subscription service
 
@@ -162,8 +179,9 @@ generations are refunded automatically.
 - **Failures don't cost you.** Upstream errors and content-filter rejections are
   refunded automatically; optional per-key daily caps and `idempotency_key` bound the
   downside further.
-- **Crypto or Telegram Stars, no card required.** Top up anonymously; one balance and
-  one history are shared between the API and the website.
+- **Crypto top-ups, no card required.** Deposits of $50+ / $100+ receive 5% / 10%
+  extra balance, and an active partner promo code adds another 10%. One balance and
+  one image/video history are shared between MCP and the website.
 
 ## Registry
 

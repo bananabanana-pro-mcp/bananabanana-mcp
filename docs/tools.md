@@ -1,11 +1,12 @@
 # Tools
 
-The server exposes **7 tools**. Read-only tools (`list_models`, `get_account`,
+The server exposes **9 tools**. Read-only tools (`list_models`, `get_account`,
 `get_result`, `list_generations`) are free. Generation tools charge your balance.
 
-Generation is **asynchronous**: a `generate_*` / `edit_image` call charges (or quotes)
+Image and video generation/editing is **asynchronous**: the tool charges (or quotes)
 and returns a `job_id` with `status: "processing"`; you then poll `get_result` for the
-finished media URLs.
+finished media URLs. `generate_speech` is synchronous: it returns a hosted WAV URL
+directly and does not create an image/video Generation record.
 
 **Cost confirmation is mandatory** for `generate_video` and `edit_video` (always) and for
 `generate_image` with `number_of_images > 1`. The first such call returns
@@ -33,7 +34,7 @@ for the live numbers rather than hard-coding them.
 
 ## `list_models`  — free
 
-List every image and video model with live per-unit USD prices, resolutions,
+List every image, video and speech model with live per-unit USD prices, resolutions,
 durations and constraints. Call this before quoting a cost or choosing a model.
 
 **Parameters:** none.
@@ -56,7 +57,10 @@ durations and constraints. Call this before quoting a cost or choosing a model.
   ],
   "video_models": [
     { "id": "veo-3.1", "type": "video", "prices_usd": { "silent": { "720p": { "4": 0.70, "6": 1.05, "8": 1.40 } }, "with_audio": { "720p": { "4": 1.50, "6": 2.25, "8": 3.00 } } } },
-    { "id": "omni-flash", "type": "video", "price_usd_flat": 1.00, "resolutions": ["720p"] }
+    { "id": "omni-flash", "type": "video", "price_usd_per_second": 0.10, "durations_seconds": [3, 4, 5, 6, 7, 8, 9, 10], "resolutions": ["720p"] }
+  ],
+  "speech_models": [
+    { "id": "gemini-3.1-flash-tts-preview", "type": "speech", "price_usd_per_started_200_characters": 0.01 }
   ],
   "top_up_url": "https://bananabanana.pro/profile",
   "docs_url": "https://bananabanana.pro/mcp"
@@ -101,6 +105,7 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
 | `negative_prompt` | string, ≤1000 | — | What to avoid. |
 | `output_format` | enum | `jpeg` | `jpeg`, `png`, `webp`. |
 | `seed` | integer 0–2147483647 | — | For reproducible results. |
+| `reference_images` | string[], ≤14 | — | Visual references supplied as a completed image `job_id`, a public http(s) image URL, or an inline `data:image/png|jpeg|webp;base64,...` URL (≤10 MB each). A remote server cannot read a bare local filesystem path; encode a local file as a data URL. |
 | `relaxed_filter` | boolean | `false` | Loosens the **configurable** stage of Google's content filter for this call (safety thresholds off, adult person generation allowed). It relaxes the check applied to the request *before* generation — the standard retry after a `SAFETY_FILTERED` failure with `upstream_reason: "SAFETY_BLOCK"`. The classifier that inspects the finished image (`upstream_reason: "IMAGE_SAFETY"`) is not configurable and stays active; it judges each rendered image separately, so borderline subjects often pass on a retry, but not *because* of this flag. See [Two filter stages](troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does). |
 | `confirm_cost` | number | — | Required for batches: the quoted total USD you accept. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
@@ -160,6 +165,7 @@ auto-refund on failure.
 | `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096` (model constraints apply). |
 | `output_format` | enum | `jpeg` | `jpeg`, `png`, `webp`. |
 | `seed` | integer 0–2147483647 | — | For reproducible results. |
+| `relaxed_filter` | boolean | `false` | Same two-stage image-filter behavior as `generate_image`; it only relaxes Google's configurable request-stage presets. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
 
 **Example call**
@@ -194,10 +200,10 @@ to start. Returns a `job_id`; videos take **1–10+ minutes**.
 | `aspect_ratio` | enum | `16:9` | `16:9`, `9:16`. |
 | `with_audio` | boolean | `false` | Native audio for Veo (costs more). `omni-flash` always has audio. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound (used when audio is on). |
-| `negative_prompt` | string, ≤1000 | — | Veo. |
+| `negative_prompt` | string, ≤1000 | — | Native negative field on Veo. Omni Flash has no separate field, so the server appends it to the prompt as plain text. |
 | `seed` | integer 0–2147483647 | — | Veo only. |
-| `first_frame` | string | — | Animate a still image: the `job_id` of a completed image generation on this account, **or** a public http(s) image URL (a signed `get_result` URL works — that is how you pick one variant of a multi-image job). On `omni-flash` it combines with `reference_images`; on Veo it is either/or. |
-| `reference_images` | string[], ≤10 | — | Reference images that keep a subject, character or style consistent — they are **not** used as literal frames. Same forms as `first_frame` (`job_id` or public URL). `omni-flash`: up to 10 images in total together with `first_frame`. Veo: at most 3, only with `duration: 8` and without `first_frame`. |
+| `first_frame` | string | — | Animate a still image: a completed image `job_id`, a public http(s) image URL, or an inline base64 image data URL. A signed `get_result` URL selects one variant of a multi-image job. On `omni-flash` it combines with `reference_images`; on Veo it is either/or. |
+| `reference_images` | string[], ≤10 | — | Subject/style references, not literal frames. Each uses the same three forms as `first_frame`; encode local files as inline data URLs rather than passing filesystem paths. `omni-flash`: up to 10 images total with `first_frame`. Veo: at most 3, only with `duration: 8` and without `first_frame`. |
 | `relaxed_filter` | boolean | `false` | **Veo only** (`omni-flash` ignores it), and close to a no-op: Google exposes no configurable safety settings for Veo, so the flag can only pin `personGeneration=allow_adult` — already the default for Veo 3.1. Video is filtered before generation and again on the finished clip (`rai_media_filtered_reasons`), and neither check can be switched off. After a rejection, retry (refused clips are refunded), reword, or switch model. See [Two filter stages](troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does). |
 | `edit_from_generation_id` | string | — | **`omni-flash` only:** `job_id` of a completed omni video to refine conversationally; `prompt` describes the changes. Duration, aspect ratio and scene context are inherited from that clip. |
 | `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
@@ -251,10 +257,11 @@ consistent, without uploading base64 anywhere:
 }
 ```
 
-Images are fetched server-side and downscaled before they reach the model; private
-and internal addresses are rejected. The quote echoes `input_images` so you can see
-how many were accepted. Editing modes (`edit_from_generation_id`, `edit_video`) take
-their context from the source clip and ignore image inputs.
+URL images are fetched server-side and downscaled before they reach the model; private
+and internal addresses are rejected. Local files must be passed as inline base64 data
+URLs. The quote echoes `input_images` so you can see how many were accepted. Editing
+modes (`edit_from_generation_id`, `edit_video`) take their context from the source clip
+and ignore image inputs.
 
 ---
 
@@ -279,7 +286,7 @@ Clips shorter than 3 seconds are rejected.
 |---|---|---|---|
 | `prompt` | string, ≤2000 | — | **Required.** What to change in the video. |
 | `source_generation_id` | string | — | `job_id` of a completed video on this account (see `list_generations`). Use this **or** `video_url`. |
-| `video_url` | string | — | Public http(s) link to the source clip (mp4/mov/webm/mkv, ≤200 MB). Private and internal addresses are rejected. |
+| `video_url` | string | — | Public http(s) link to the source clip (mp4/mov/webm/mkv/avi/wmv/flv/3gpp, ≤200 MB). Private and internal addresses are rejected. |
 | `source_ref` | string | — | Returned by the quote when `video_url` was used. Pass it back with `confirm_cost` to reuse the already downloaded clip instead of downloading it again. |
 | `duration` | integer 3–10 | source length | Trim the source to its first N seconds and edit only that part ($0.10/s). Values above the source length are ignored — a clip cannot be made longer. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound — Omni Flash always generates audio. |
@@ -320,6 +327,65 @@ with `status: "processing"`.
 > can link to. For refining an **omni-flash** clip you generated moments ago, the
 > conversational `generate_video` + `edit_from_generation_id` path keeps the original
 > scene context and is usually the better choice.
+
+---
+
+## `generate_speech` — paid ($0.01 per started 200 transcript characters)
+
+Generate natural speech with Gemini 3.1 Flash TTS Preview. Unlike image and video
+tools, this call is **synchronous**: it returns a hosted WAV URL directly, requires no
+`get_result` polling and does not create an image/video Generation record. The account
+is charged only after the upstream model has returned valid audio.
+
+| Parameter | Type | Default | Notes |
+|---|---|---|---|
+| `text` | string, ≤6000 | — | **Required.** Exact transcript. In dialogue mode, prefix each turn with the matching speaker name. |
+| `style` | string, ≤1500 | — | Overall persona, scene, emotion, accent, pace, pronunciation and delivery direction. |
+| `voice` | enum | `Kore` | Single-speaker voice. Ignored when `speakers` is provided. |
+| `language_code` | string | automatic | Optional BCP-47 language/locale such as `en-US`, `ru-RU`, `ja-JP` or `es-MX`. |
+| `speakers` | object[2] | — | Exactly two dialogue speakers. Each object requires a `name` (1–40 chars) and `voice`; those names must prefix turns in `text`. |
+| `idempotency_key` | string, ≤64 | — | Safe-retry key. |
+
+Available voices:
+
+`Achernar`, `Achird`, `Algenib`, `Algieba`, `Alnilam`, `Aoede`, `Autonoe`,
+`Callirrhoe`, `Charon`, `Despina`, `Enceladus`, `Erinome`, `Fenrir`, `Gacrux`,
+`Iapetus`, `Kore`, `Laomedeia`, `Leda`, `Orus`, `Pulcherrima`, `Puck`,
+`Rasalgethi`, `Sadachbia`, `Sadaltager`, `Schedar`, `Sulafat`, `Umbriel`,
+`Vindemiatrix`, `Zephyr`, `Zubenelgenubi`.
+
+The generated file is mono, 24 kHz, 16-bit WAV. `style` and `text` together must fit
+within 8,000 UTF-8 bytes; split longer scripts to keep voice quality stable. Inline
+performance tags include `[whispers]`, `[laughs]`, `[sighs]`, `[shouting]`,
+`[very fast]` and `[very slow]`.
+
+**Single-speaker example**
+
+```json
+{
+  "name": "generate_speech",
+  "arguments": {
+    "text": "[cheerfully] Welcome to BananaBanana!",
+    "voice": "Kore",
+    "style": "Warm product announcement, medium pace."
+  }
+}
+```
+
+**Two-speaker example**
+
+```json
+{
+  "name": "generate_speech",
+  "arguments": {
+    "text": "Sam: Did the render finish?\nMira: Yes, it is ready to review.",
+    "speakers": [
+      { "name": "Sam", "voice": "Charon" },
+      { "name": "Mira", "voice": "Aoede" }
+    ]
+  }
+}
+```
 
 ---
 

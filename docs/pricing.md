@@ -1,14 +1,27 @@
 # Pricing
 
 BananaBanana is **pay-as-you-go**: you top up a balance and each generation is charged
-to it. No subscription, no monthly fee, no credit-card hold. Top up with **crypto** or
-**Telegram Stars** at <https://bananabanana.pro/profile>.
+to it. No subscription, no monthly fee, no credit-card hold. Top up with **crypto** at
+<https://bananabanana.pro/profile>.
 
 > These tables are current at the time of writing. Prices are always available live
 > from the [`list_models`](./tools.md#list_models--free) tool — treat that as the
 > source of truth and let your agent read it before quoting a cost.
 
-All prices are **USD, per generated item** (per image, per video clip).
+All prices are in **USD**. Images are billed per image, Veo per clip, Omni Flash per
+second, and speech per started block of transcript characters.
+
+## Top-up bonuses and effective cost
+
+- Deposits of **$50+** receive **5% extra balance**.
+- Deposits of **$100+** receive **10% extra balance**.
+- An active partner promo code adds another **10%** to each deposit while it is active.
+- The volume bonus and promo-code bonus stack: a $100 deposit with an active code
+  credits $120 to the account balance.
+
+The model tables below show the nominal amount deducted from the BananaBanana balance.
+Because bonuses add balance without increasing the deposit by the same amount, the
+effective out-of-pocket price can be lower.
 
 ## Images (per image)
 
@@ -26,6 +39,10 @@ model and resolution.
 
 Veo clips are priced by model × resolution × duration, and separately for silent vs.
 native audio. Durations available via the API: **4, 6, 8 seconds**.
+
+The 7-second entries returned inside Veo price maps by `list_models` apply to extension
+jobs. A new MCP `generate_video` call accepts only 4, 6 or 8 seconds for Veo; 7 seconds
+is not a selectable generation duration.
 
 ### Silent
 
@@ -57,7 +74,15 @@ native audio. Durations available via the API: **4, 6, 8 seconds**.
 |---|---|---|
 | `omni-flash` | **$0.10 per second** ($0.30 – $1.00) | Always includes sound. 720p only. Duration is exact: 3–10 s, billed per second. Editing an existing clip costs the same per second — and its length always equals the source length (see `edit_video`). |
 
-**Overall ranges:** images **$0.03–$0.20**, video **$0.10–$4.40** per clip.
+## Speech
+
+| Model | Price | Notes |
+|---|---|---|
+| `gemini-3.1-flash-tts-preview` | **$0.01 per started 200 transcript characters** | One voice or exactly two named dialogue speakers. Returns mono 24 kHz, 16-bit WAV audio synchronously. |
+
+**Overall ranges:** images **$0.03–$0.20** each; video **$0.10–$4.40** per clip, with
+Omni Flash billed at **$0.10/s**; speech **$0.01 per started 200 transcript
+characters**.
 
 ## Cost transparency
 
@@ -70,6 +95,8 @@ The server is built so an agent never spends by surprise:
   `balance_remaining_usd`.
 - **Automatic refunds.** If a generation fails upstream or is rejected by the content
   filter, the charge is refunded automatically (`refunded: true` in `get_result`).
+- **Speech charges after valid audio.** `generate_speech` charges only after the
+  upstream model has returned valid audio.
 - **Free reads.** `list_models`, `get_account`, `get_result` and `list_generations`
   never cost anything.
 
@@ -77,7 +104,8 @@ The server is built so an agent never spends by surprise:
 
 - **Per-key daily spend cap (optional).** Set a USD cap on any key. When exceeded, paid
   calls return `DAILY_CAP_EXCEEDED` until the next UTC day. Manage it in the profile.
-- **Rate limit.** 20 tool calls per minute per key.
+- **Rate limits.** A request may return HTTP `429` or tool error `RATE_LIMITED`.
+  Respect `Retry-After` when present and retry with backoff.
 - **Per-key usage log.** Tool, model, cost and a prompt preview are recorded per key
   and visible in your profile.
 
@@ -87,4 +115,6 @@ The server is built so an agent never spends by surprise:
   balance and one generation history.
 - A single image is charged on start (and refunded if it fails). Videos and multi-image
   batches are charged only after you confirm the quote.
+- Speech is synchronous and charged only after valid audio has been returned; it does
+  not create an image/video Generation record.
 - `idempotency_key` makes retries safe: the same key never double-charges.

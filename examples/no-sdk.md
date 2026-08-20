@@ -107,14 +107,15 @@ console.log(out.files[0].url, "cost:", out.cost_charged_usd);
 - **Async jobs.** `generate_image` / `generate_video` return a `job_id` immediately;
   poll `get_result` (free, long-polls up to 30 s per call) until `status` is
   `completed` or `failed`. Failed jobs are refunded automatically.
-- **Cost confirmation.** `generate_video` and multi-image `generate_image` return
-  `status: "confirmation_required"` with a `quoted_cost_usd` and charge nothing —
-  repeat the call with `confirm_cost: <quoted value>` to run it. See
+- **Cost confirmation.** `generate_video`, `edit_video` and multi-image
+  `generate_image` return `status: "confirmation_required"` with a
+  `quoted_cost_usd` and charge nothing — repeat the call with
+  `confirm_cost: <quoted value>` to run it. See
   [`../docs/tools.md`](../docs/tools.md).
 - **Idempotency.** Pass an `idempotency_key` argument to any `generate_*` call to
   make retries safe — a repeated key never charges twice.
 - **Errors.** JSON-RPC errors carry a machine-readable code (`INSUFFICIENT_BALANCE`,
   `SAFETY_FILTERED`, `RATE_LIMITED`, …) — see
   [`../docs/troubleshooting.md`](../docs/troubleshooting.md).
-- **Limits.** 20 tool calls/min per key. Media URLs are signed and valid for 24 h —
-  download what you want to keep.
+- **Limits.** Respect HTTP `429`, tool error `RATE_LIMITED` and `Retry-After` when
+  present. Media URLs are signed and valid for 24 h — download what you want to keep.
