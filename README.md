@@ -1,10 +1,12 @@
 # BananaBanana MCP Server
 
+[![MCP Badge](https://lobehub.com/badge/mcp/bananabanana-pro-mcp-bananabanana-mcp)](https://lobehub.com/mcp/bananabanana-pro-mcp-bananabanana-mcp)
+
 An MCP server for **image, video, and speech generation** — Google **Nano Banana**, **Veo**, **Omni**, and **Gemini TTS** models — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto payments** and **no subscription**.
 
 - **Endpoint:** `https://bananabanana.pro/api/mcp` (streamable HTTP)
-- **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile)
-- **Website:** <https://bananabanana.pro> · **Docs & live example:** <https://bananabanana.pro/mcp>
+- **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog)
+- **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog> · **Docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
 
 Generate images from $0.03, videos from $0.10, and speech for $0.01 per started 200
 transcript characters, billed from an account balance you top up with crypto. Cost
@@ -20,7 +22,7 @@ OAuth and for scripts or CI:
   add a custom connector with the URL above, press Connect and approve access. No key
   to copy. See [docs/authentication.md](./docs/authentication.md).
 - **API key** (Cursor, VS Code, Windsurf, Codex, scripts, CI): create a key in your
-  profile — <https://bananabanana.pro/profile>, API Keys section — and put it in the
+  profile — <https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog>, API Keys section — and put it in the
   client config as shown below.
 
 ### claude.ai / Claude Desktop / mobile (OAuth)
@@ -201,9 +203,9 @@ curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=pro.bananaba
 
 ## Links
 
-- **Website:** <https://bananabanana.pro>
-- **MCP docs & live example:** <https://bananabanana.pro/mcp>
-- **Create an API key:** <https://bananabanana.pro/profile>
+- **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog>
+- **MCP docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
+- **Create an API key:** <https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog>
 - **Authentication** · [`docs/authentication.md`](./docs/authentication.md)
 - **Tools reference** · [`docs/tools.md`](./docs/tools.md)
 - **Pricing & limits** · [`docs/pricing.md`](./docs/pricing.md)
