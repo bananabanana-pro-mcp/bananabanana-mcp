@@ -316,8 +316,8 @@ by insufficient balance or an optional daily spend cap.
 - Replace flat or model-selected Omni wording with $0.10 per user-selected output second
   for 3–10 seconds; keep Veo at 4/6/8 seconds for new clips and note seven seconds only
   for extension jobs.
-- Replace the payment, bonus and promo text with the canonical copy; remove every
-  reference to Telegram Stars.
+- Replace the payment, bonus and promo text with the canonical copy; remove references
+  to unsupported payment methods.
 - Verify the repository, website, docs, icon and Apache-2.0 license links.
 
 ### mcp.so
@@ -328,7 +328,7 @@ by insufficient balance or an optional daily spend cap.
 - Change the visible tool count from seven to nine and add `edit_video` and
   `generate_speech`; paid tools total five and free tools total four.
 - Remove the stale statements that Omni is a flat $1.00, that its duration is chosen by
-  the model, and that payment supports Telegram Stars.
+  the model, and that unsupported payment methods are available.
 - Add speech to the title/description and add relevant speech and video-editing tags if
   the form exposes tags.
 - Verify the repository, homepage, documentation, icon, category and Apache-2.0 license.
