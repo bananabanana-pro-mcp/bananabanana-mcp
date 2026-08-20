@@ -6,6 +6,29 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.8] — 2026-08-20
+
+### Added
+
+- Added the free `top_up` tool, bringing the live catalogue to ten tools. OAuth
+  connections receive a one-time, account-bound deposit-only link valid for 30
+  minutes; API-key users receive the normal profile URL.
+- Added restricted OAuth top-up sessions with a two-hour sliding idle timeout. URL
+  and cookie secrets are stored only as SHA-256 hashes, raw URL tokens are excluded
+  from nginx access logs, and the restricted page cannot expose API keys, profile
+  data, generation history or promo-code controls.
+- Added a top-up link to insufficient-balance errors. Completed `get_result` responses
+  now include the remaining balance and add the same link when it is below the
+  cheapest image price derived from the application price table.
+
+### Changed
+
+- Changed the `generate_image` default from `nano-banana-2` to the $0.03,
+  1024-only `nano-banana-2-lite` model. Callers can choose `nano-banana-2` explicitly
+  for 512, 2048 or 4096 output; `edit_image` keeps its existing default.
+- Limited OAuth top-up-link issuance to three per minute for each credential. Used,
+  expired or cross-browser links return actionable guidance to call `top_up` again.
+
 ## [1.0.7] — 2026-08-20
 
 ### Added

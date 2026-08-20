@@ -3,7 +3,7 @@
   "name": "pro.bananabanana/image-video",
   "title": "BananaBanana Image, Video & Speech Generation",
   "description": "Generate images, video & speech with Nano Banana, Veo, Omni and Gemini TTS. Pay as you go.",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "websiteUrl": "https://bananabanana.pro/mcp",
   "repository": {
     "url": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
