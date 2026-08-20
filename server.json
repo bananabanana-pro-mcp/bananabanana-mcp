@@ -21,15 +21,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://bananabanana.pro/api/mcp",
-      "headers": [
-        {
-          "name": "Authorization",
-          "description": "Bearer credential. Leave empty if your client signs in with OAuth 2.1 (claude.ai, Claude Desktop/Code, MCP Inspector) — it obtains the token itself. Otherwise put an API key here as 'Bearer bb_live_…'; create one at https://bananabanana.pro/profile.",
-          "isRequired": false,
-          "isSecret": true
-        }
-      ]
+      "url": "https://bananabanana.pro/api/mcp"
     }
   ]
 }

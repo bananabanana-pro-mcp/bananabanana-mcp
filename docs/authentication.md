@@ -5,7 +5,7 @@ token on every request:
 
 | Method | Best for | What you do |
 |--------|----------|-------------|
-| **OAuth 2.1** | claude.ai, Claude Desktop, Claude mobile, Claude Code, ChatGPT/Grok web connectors, MCP Inspector | paste the server URL, sign in, approve access — nothing to copy |
+| **OAuth 2.1** | claude.ai, Claude Desktop, Claude mobile, Claude Code, MCP Inspector and other OAuth-capable clients | paste the server URL, sign in, approve access — nothing to copy |
 | **API key** (`bb_live_…`) | Cursor, VS Code, Windsurf, Codex CLI, scripts, CI | create a key in your profile and put it in the client config |
 
 - **Endpoint:** `https://bananabanana.pro/api/mcp`
@@ -21,11 +21,20 @@ The server implements the [MCP authorization spec](https://modelcontextprotocol.
 OAuth 2.1 with PKCE (S256), dynamic client registration (RFC 7591), protected resource
 metadata (RFC 9728) and resource indicators (RFC 8707).
 
-In a connector-style client the whole flow is:
+In an OAuth-capable client the flow is:
 
 1. Add a custom connector with the URL `https://bananabanana.pro/api/mcp`.
-2. The client registers itself and opens a BananaBanana consent screen.
-3. Sign in (or create an account) and approve access.
+2. The first protected tool call receives HTTP `401` with a `WWW-Authenticate`
+   pointer to the protected-resource metadata.
+3. The client discovers the authorization server and its endpoints. Clients using
+   dynamic registration register themselves at `/api/oauth/register`.
+4. The client creates an S256 PKCE challenge and opens the BananaBanana authorization
+   page in a browser.
+5. Sign in (or create an account) and approve access.
+6. The client exchanges the returned authorization code, together with its PKCE
+   verifier and the MCP `resource`, for an access token.
+7. The client sends that token as `Authorization: Bearer <access-token>` on protected
+   MCP requests and uses the refresh-token grant when a refresh token was issued.
 
 From then on generations are billed to the account you signed in with. Connected apps
 are listed in <https://bananabanana.pro/profile> and can be disconnected there at any
@@ -35,6 +44,7 @@ time — that invalidates their tokens immediately.
 
 | Document | URL |
 |----------|-----|
+| Protected resource metadata at the domain root (RFC 9728) | `https://bananabanana.pro/.well-known/oauth-protected-resource` |
 | Protected resource metadata (RFC 9728) | `https://bananabanana.pro/.well-known/oauth-protected-resource/api/mcp` |
 | Authorization server metadata (RFC 8414) | `https://bananabanana.pro/.well-known/oauth-authorization-server` |
 | Dynamic client registration (RFC 7591) | `POST https://bananabanana.pro/api/oauth/register` |
@@ -51,11 +61,6 @@ Details that matter when you implement a client:
   authorization and the token request. Tokens are audience-bound to this server.
 - **Grants:** `authorization_code` and `refresh_token`. `client_credentials` is *not*
   supported — every connection needs a user's consent.
-- **Token lifetimes:** access token 1 hour, refresh token 90 days. Refresh tokens are
-  rotated on every use; replaying an old one revokes the whole connection.
-- **Redirect URIs:** must be `https`, or `http` on a loopback address. Loopback URIs
-  are matched with the port ignored (RFC 8252 §7.3), so native clients that bind an
-  ephemeral port work without re-registering.
 - **Token endpoint body:** `application/x-www-form-urlencoded`. The registration
   endpoint takes `application/json`.
 
@@ -68,6 +73,12 @@ WWW-Authenticate: Bearer realm="bananabanana", resource_metadata="https://banana
 
 `initialize`, `ping` and `tools/list` answer without credentials, so a client can
 inspect the tool catalogue before signing in (lazy authentication).
+
+The Registry descriptor intentionally declares only the remote URL — it does not
+declare a manual `Authorization` header. OAuth discovery happens at runtime through
+the standard `401` challenge and well-known documents above. This does not change
+existing API-key configurations: a manually configured `Authorization: Bearer
+bb_live_…` header continues to work.
 
 ## API keys
 
@@ -82,17 +93,15 @@ inspect the tool catalogue before signing in (lazy authentication).
 A key looks like:
 
 ```
-bb_live_0123456789abcdef0123456789abcdef01234567
+bb_live_…
 ```
-
-That is the `bb_live_` prefix followed by 40 hexadecimal characters.
 
 ### Use the key
 
 Send it in the `Authorization` header on every request:
 
 ```
-Authorization: Bearer bb_live_0123456789abcdef0123456789abcdef01234567
+Authorization: Bearer bb_live_YOUR_KEY
 ```
 
 See the [`examples/`](../examples) directory for ready-to-paste client configs
@@ -128,7 +137,8 @@ entry in the profile with the same controls.
 - **Daily spend cap (optional).** Each credential can carry a daily USD cap. Once it
   has spent that much in a UTC day, further paid calls return `DAILY_CAP_EXCEEDED`
   until the next UTC day. Set or change it in the profile.
-- **Rate limit.** 20 tool calls per minute per credential.
+- **Rate limits.** Requests may return HTTP `429` or tool error `RATE_LIMITED`.
+  Respect `Retry-After` when present and retry with backoff.
 - **Usage log.** Every paid tool call is recorded (tool, model, cost, prompt
   preview) and visible in your profile.
 
@@ -150,8 +160,8 @@ See [pricing.md](./pricing.md) for the full cost and limits picture.
   real keys out of any config you check in — use placeholders like `bb_live_YOUR_KEY`.
 - Prefer client features that store the key securely (e.g. VS Code's encrypted
   `promptString` input, shown in [`examples/vscode.json`](../examples/vscode.json)).
-- Where OAuth is available, prefer it: no long-lived secret sits in a config file,
-  access tokens expire after an hour and refresh tokens rotate.
+- Where OAuth is available, prefer it: no manually copied API key sits in a config
+  file, access tokens expire and capable clients refresh them automatically.
 - Use separate credentials per machine/project and set daily caps to bound the blast
   radius.
 - Rotate periodically.
