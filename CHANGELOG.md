@@ -30,6 +30,10 @@ and the server follows [Semantic Versioning](https://semver.org/).
   supported by the server.
 - Updated the Registry title and description to include speech generation.
 
+Registry history: `1.0.6` was deprecated with status message
+“Superseded by 1.0.7 (documentation synced to nine live tools and current pricing;
+OAuth discovery is primary).”
+
 ## [1.0.6] — 2026-08-16
 
 ### Changed
