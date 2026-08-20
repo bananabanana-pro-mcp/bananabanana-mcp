@@ -114,7 +114,9 @@ The bridge opens the OAuth sign-in flow on first use. See
 </details>
 
 Ready-to-copy configs live in [`examples/`](./examples). Once connected, ask your agent
-to run `list_models` (free) — it returns the live model list and prices.
+to run `list_models` (free) — it returns the live model list and prices. An OAuth user
+can also ask the agent to call `top_up`; the returned browser link grants deposit-only
+access without exposing the full profile.
 
 **No MCP client?** The server is plain JSON-RPC over HTTPS — call it from curl, Python
 or TypeScript with no SDK: [`examples/no-sdk.md`](./examples/no-sdk.md) (runnable
@@ -122,13 +124,15 @@ scripts: [`generate.py`](./examples/generate.py), [`generate.mjs`](./examples/ge
 
 ## Tools
 
-Nine tools; the read-only ones are free. Full reference in [`docs/tools.md`](./docs/tools.md).
+Ten tools; the read-only and account-access tools are free. Full reference in
+[`docs/tools.md`](./docs/tools.md).
 
 | Tool | What it does | Key parameters |
 |---|---|---|
 | `list_models` | List models with live USD prices, resolutions, durations, constraints. Free. | — |
 | `get_account` | Balance, key name, daily cap, spend today. Free. | — |
-| `generate_image` | Text-to-image (Nano Banana 2 Lite / 2 / Pro), up to 4K, 1–4 variants. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `confirm_cost` |
+| `top_up` | Return a balance top-up link. OAuth gets a one-time deposit-only link; API-key users get the profile URL. Free. | — |
+| `generate_image` | Text-to-image (Nano Banana 2 Lite / 2 / Pro), up to 4K, 1–4 variants. Lite is the default; choose Nano Banana 2 for resolutions above 1024. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `confirm_cost` |
 | `edit_image` | Multi-turn edit of a finished image by text instruction. | `source_generation_id`, `prompt`, `model`, `resolution` |
 | `generate_video` | Video (Veo 3.1 family or Omni Flash), optionally from a start frame and reference images. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `first_frame`, `reference_images`, `confirm_cost` |
 | `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `duration`, `audio_prompt`, `confirm_cost` |
@@ -161,13 +165,15 @@ full tables in [`docs/pricing.md`](./docs/pricing.md).
 Images cost **$0.03–$0.20** each; video costs **$0.10–$4.40** per clip, with Omni
 Flash billed at **$0.10/s**. Veo generation accepts 4, 6 or 8 seconds; the 7-second
 prices returned by `list_models` are for extension jobs, not a selectable
-`generate_video` duration. Free reads: `list_models`, `get_account`, `get_result`,
-`list_generations`. Failed and content-filtered generations are refunded automatically.
+`generate_video` duration. Free tools: `list_models`, `get_account`, `top_up`,
+`get_result`, `list_generations`. Failed and content-filtered generations are refunded
+automatically.
 
 Top-up bonuses can lower the effective cost: deposits of $50+ receive 5% extra
 balance, deposits of $100+ receive 10%, and an active partner promo code adds another
 10%. Bonuses stack. The table shows nominal generation charges; effective
-out-of-pocket cost depends on the top-up bonus.
+out-of-pocket cost depends on the top-up bonus. Promo codes require a normal signed-in
+profile and are intentionally unavailable in an OAuth deposit-only session.
 
 ## Why this instead of a subscription service
 

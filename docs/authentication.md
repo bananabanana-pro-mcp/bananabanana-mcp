@@ -80,6 +80,31 @@ the standard `401` challenge and well-known documents above. This does not chang
 existing API-key configurations: a manually configured `Authorization: Bearer
 bb_live_…` header continues to work.
 
+### Adding balance from an OAuth session
+
+An OAuth user does not need to open or authenticate the full website profile just to
+add funds. Call the free `top_up` tool:
+
+```json
+{ "name": "top_up", "arguments": {} }
+```
+
+It returns a one-time browser URL tied to the current account and credential. The URL
+is valid for **30 minutes** and creates a restricted **deposit-only** session whose
+idle timeout is **two hours**, sliding while the user checks the balance or waits for a
+cryptocurrency transfer. The restricted page can show the balance and deposit address,
+but cannot expose API keys, profile data, generation history or promo-code controls.
+
+Only a SHA-256 hash of each URL and session secret is stored. The raw URL token is not
+written to nginx access logs, and redemption immediately redirects to a clean URL. A
+used or expired link returns a `410` page that tells the user to ask the agent to call
+`top_up` again. Reopening the same link works only in the browser that already owns its
+restricted session; another browser cannot reuse it. Issuance is limited to three
+links per minute for each credential.
+
+Bearer API-key users receive the normal profile URL from `top_up`, because that path
+uses the ordinary web login rather than an OAuth-only restricted session.
+
 ## API keys
 
 ### Get a key

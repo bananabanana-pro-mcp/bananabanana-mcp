@@ -19,6 +19,10 @@ second, and speech per started block of transcript characters.
 - The volume bonus and promo-code bonus stack: a $100 deposit with an active code
   credits $120 to the account balance.
 
+Promo-code controls require the fully authenticated profile. The restricted page
+opened by an OAuth `top_up` link intentionally supports deposits only; an already
+active promo still affects the account according to the rules above.
+
 The model tables below show the nominal amount deducted from the BananaBanana balance.
 Because bonuses add balance without increasing the deposit by the same amount, the
 effective out-of-pocket price can be lower.
@@ -32,6 +36,9 @@ effective out-of-pocket price can be lower.
 | `nano-banana-pro` | — | $0.11 | $0.11 | $0.20 |
 
 `nano-banana-2-lite` supports 1024 only. `nano-banana-pro` has no 512.
+`generate_image` defaults to `nano-banana-2-lite`; choose `nano-banana-2` explicitly
+for 512, 2048 or 4096 output. `edit_image` continues to default to
+`nano-banana-2`.
 **Editing** (`edit_image`) costs the same as generating one image of the chosen
 model and resolution.
 

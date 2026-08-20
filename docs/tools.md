@@ -1,7 +1,8 @@
 # Tools
 
-The server exposes **9 tools**. Read-only tools (`list_models`, `get_account`,
-`get_result`, `list_generations`) are free. Generation tools charge your balance.
+The server exposes **10 tools**. Read-only and account-access tools (`list_models`,
+`get_account`, `top_up`, `get_result`, `list_generations`) are free. Generation tools
+charge your balance.
 
 Image and video generation/editing is **asynchronous**: the tool charges (or quotes)
 and returns a `job_id` with `status: "processing"`; you then poll `get_result` for the
@@ -29,6 +30,9 @@ for the live numbers rather than hard-coding them.
 - **Media URLs** — signed and valid for **24 hours**. The media itself is kept — call
   `get_result` again for fresh links.
 - **Refunds** — failed and content-filtered generations are refunded automatically.
+- **Secure OAuth top-up** — `top_up` returns a one-time, 30-minute browser link for an
+  OAuth connection. It opens a deposit-only session with a two-hour sliding idle
+  timeout; it cannot expose profile data, API keys, generation history or promo codes.
 
 ---
 
@@ -89,6 +93,41 @@ how much of it is used today (UTC).
 
 ---
 
+## `top_up`  — free
+
+Return a link for adding cryptocurrency to the account balance. The response depends
+on how the MCP connection authenticated:
+
+- **OAuth:** a one-time URL valid for 30 minutes. Opening it creates a restricted
+  deposit-only browser session with a two-hour sliding idle timeout. The page can show
+  the balance, create or display a deposit address and wait for a transfer; it cannot
+  expose the full profile, API keys, generation history or promo-code controls.
+- **Bearer API key:** the normal profile URL. Sign in there if the browser does not
+  already have a web session.
+
+Link creation is limited to three per minute for each credential. If a link is used,
+expired or opened in another browser, ask the agent to call `top_up` again.
+
+**Parameters:** none.
+
+**OAuth response**
+
+```json
+{
+  "balance_usd": 0.01,
+  "top_up_url": "https://bananabanana.pro/mcp/top-up?token=bb_tu_…",
+  "expires_at": "2026-08-20T13:30:00.000Z",
+  "single_use": true,
+  "access": "deposit_only",
+  "next_step": "Open top_up_url in a browser. It grants deposit-only access and does not sign in to the full profile."
+}
+```
+
+The raw token is never stored in the database or written to nginx access logs. After
+redemption the browser is redirected to the clean `/mcp/top-up` URL.
+
+---
+
 ## `generate_image`  — paid ($0.03–$0.20 per image)
 
 Start a text-to-image generation with the Google Nano Banana family. Charges
@@ -98,7 +137,7 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
 | Parameter | Type | Default | Notes |
 |---|---|---|---|
 | `prompt` | string, ≤2000 | — | **Required.** English works best. |
-| `model` | enum | `nano-banana-2` | `nano-banana-2-lite` (cheapest, 1024 only) · `nano-banana-2` · `nano-banana-pro` (top quality, up to 4K, no 512). |
+| `model` | enum | `nano-banana-2-lite` | `nano-banana-2-lite` (cheapest default, 1024 only) · `nano-banana-2` (choose for 512, 2048 or 4096) · `nano-banana-pro` (top quality, up to 4K, no 512). |
 | `aspect_ratio` | enum | `1:1` | `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`. |
 | `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096`. 512 only on `nano-banana-2`; lite is 1024 only; `nano-banana-pro` has no 512. |
 | `number_of_images` | integer 1–4 | `1` | `>1` requires `confirm_cost`. |
@@ -117,7 +156,7 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
   "name": "generate_image",
   "arguments": {
     "prompt": "studio photo of a ceramic mug on linen, soft daylight",
-    "model": "nano-banana-2",
+    "model": "nano-banana-2-lite",
     "aspect_ratio": "4:5",
     "resolution": "1024"
   }
@@ -130,8 +169,8 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
 {
   "job_id": "cmxyz123...",
   "status": "processing",
-  "cost_charged_usd": 0.06,
-  "balance_remaining_usd": 12.34,
+  "cost_charged_usd": 0.03,
+  "balance_remaining_usd": 12.37,
   "next_step": "Call get_result with job_id \"cmxyz123...\". Images usually finish in 10–60 seconds."
 }
 ```
@@ -141,10 +180,10 @@ immediately for a single image and returns a `job_id`. Typical completion 10–6
 ```json
 {
   "status": "confirmation_required",
-  "quoted_cost_usd": 0.18,
+  "quoted_cost_usd": 0.09,
   "balance_usd": 12.40,
-  "message": "Generating 3 images costs $0.18. Nothing has been charged.",
-  "next_step": "Call generate_image again with the same arguments plus confirm_cost: 0.18."
+  "message": "Generating 3 images costs $0.09. Nothing has been charged.",
+  "next_step": "Call generate_image again with the same arguments plus confirm_cost: 0.09."
 }
 ```
 
@@ -419,6 +458,11 @@ images.
 ```
 
 Image responses also include a small inline `image` preview block alongside the JSON.
+Every completed result includes `balance_remaining_usd`. When that balance is below
+the cheapest current image price (derived from the application's price table), the
+response also includes `cheapest_image_price_usd`, `can_afford_cheapest_image: false`,
+a `balance_notice`, and either a `top_up_url` or the number of seconds before another
+link can be requested.
 
 **Still processing**
 

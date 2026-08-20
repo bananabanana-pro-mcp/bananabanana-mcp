@@ -14,16 +14,17 @@ This is identical to the `description` in `server.json`.
 
 BananaBanana is a hosted remote MCP server for image generation and editing, video
 generation and video-to-video editing, and speech generation. It combines Nano Banana,
-Veo, Omni Flash and Gemini TTS behind nine tools, with OAuth 2.1 sign-in, pay-as-you-go
+Veo, Omni Flash and Gemini TTS behind ten tools, with OAuth 2.1 sign-in, pay-as-you-go
 pricing, cost confirmation before every video job, and automatic refunds on failure.
 
 ## Long description
 
 BananaBanana is a hosted remote MCP server for creating images, video and speech from
-an MCP client. Its nine live tools cover model and account discovery, image generation
-and editing, video generation and video-to-video editing, synchronous speech generation,
-job polling and generation history. It works with Claude Code, Claude Desktop, Cursor,
-VS Code, Windsurf and other clients that support remote Streamable HTTP MCP servers.
+an MCP client. Its ten live tools cover model and account discovery, secure balance
+top-up, image generation and editing, video generation and video-to-video editing,
+synchronous speech generation, job polling and generation history. It works with
+Claude Code, Claude Desktop, Cursor, VS Code, Windsurf and other clients that support
+remote Streamable HTTP MCP servers.
 
 Unlike a thin wrapper around a single Gemini API, BananaBanana does not require the
 user to install a runtime or supply a Google API key. It provides one hosted endpoint
@@ -50,7 +51,10 @@ The balance is funded with cryptocurrency. Deposits of $50 or more receive 5% ex
 balance, and deposits of $100 or more receive 10% extra balance. While a partner promo
 code is active it adds another 10%; the promo and deposit bonus stack, so a $100 deposit
 with an active code credits $120. These bonuses lower the effective out-of-pocket cost
-of generations without changing their displayed balance charge.
+of generations without changing their displayed balance charge. OAuth users can call
+`top_up` for a one-time 30-minute link to a deposit-only page; the restricted session
+has a two-hour sliding idle timeout and does not expose the full profile or promo-code
+controls.
 
 ## Current price summary
 
@@ -73,6 +77,8 @@ model/resolution/audio combination.
 - `list_models` — list the live model catalogue, USD prices, durations, resolutions and
   constraints; free.
 - `get_account` — show balance, credential identity, daily cap and spend today; free.
+- `top_up` — return a secure balance top-up link; OAuth gets deposit-only access and
+  API-key users get the normal profile; free.
 - `generate_image` — generate one to four images with the Nano Banana family; paid.
 - `edit_image` — edit a completed image with a text instruction; paid.
 - `generate_video` — generate a Veo or Omni Flash clip, optionally using image inputs;
@@ -260,14 +266,16 @@ No. Generations are charged against a prepaid balance; there is no monthly subsc
 ### How do I pay?
 
 Fund the balance with cryptocurrency. Deposit-size bonuses and an active partner promo
-code can add extra balance as described above.
+code can add extra balance as described above. An OAuth user can ask the agent to call
+`top_up`; promo-code controls still require the fully authenticated profile.
 
 ### How much does generation cost?
 
 Images cost $0.03–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip.
 Omni Flash costs $0.10 per output second for 3–10 seconds, and speech costs $0.01 per
 started 200 transcript characters. Run the free `list_models` tool for the complete
-current matrix.
+current matrix. `generate_image` defaults to the $0.03 `nano-banana-2-lite` model at
+1024; choose `nano-banana-2` explicitly for 512, 2048 or 4096 output.
 
 ### Who selects the duration?
 
@@ -311,8 +319,8 @@ by insufficient balance or an optional daily spend cap.
 - Set the remote endpoint to `https://bananabanana.pro/api/mcp` and make OAuth discovery
   the primary authentication path. Do not require an API-key configuration field;
   mention Bearer keys only as the fallback.
-- Refresh or rescan the tool catalogue and verify that all nine tools appear, especially
-  `edit_video` and `generate_speech`.
+- Refresh or rescan the tool catalogue and verify that all ten tools appear, especially
+  `top_up`, `edit_video` and `generate_speech`.
 - Replace flat or model-selected Omni wording with $0.10 per user-selected output second
   for 3–10 seconds; keep Veo at 4/6/8 seconds for new clips and note seven seconds only
   for extension jobs.
@@ -325,8 +333,8 @@ by insufficient balance or an optional daily spend cap.
 - Click **Claim** on the existing `bananabanana-mcp` card before editing it.
 - Update **About**, **Overview**, **Config**, **Tools** and **FAQ** from this file.
 - Make the headerless OAuth config the first config and keep the Bearer config second.
-- Change the visible tool count from seven to nine and add `edit_video` and
-  `generate_speech`; paid tools total five and free tools total four.
+- Change the visible tool count to ten and add `top_up`, `edit_video` and
+  `generate_speech`; paid tools total five and free tools total five.
 - Remove the stale statements that Omni is a flat $1.00, that its duration is chosen by
   the model, and that unsupported payment methods are available.
 - Add speech to the title/description and add relevant speech and video-editing tags if
@@ -339,7 +347,7 @@ by insufficient balance or an optional daily spend cap.
   local "Nano Banana MCP" wrappers. If the official card is absent, use **Submit MCP**
   with this repository and the official Registry identity
   `pro.bananabanana/image-video`; do not edit another project's card.
-- Use the canonical short and long description, nine-tool list, pricing, payment and FAQ.
+- Use the canonical short and long description, ten-tool list, pricing, payment and FAQ.
 - Mark it as a hosted remote Streamable HTTP server, not a local npm/Python server, and
   use `https://bananabanana.pro/api/mcp` as the endpoint.
 - Put the headerless OAuth config first and the Bearer API-key fallback second.

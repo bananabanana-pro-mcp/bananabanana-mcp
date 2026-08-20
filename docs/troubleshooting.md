@@ -75,9 +75,20 @@ multiple credentials.
 
 ### `INSUFFICIENT_BALANCE`
 
-The quote or generation costs more than the available account balance. Top up at
-<https://bananabanana.pro/profile>, then repeat the original call. If the tool requires
-cost confirmation, request a fresh quote before sending `confirm_cost` again.
+The quote or generation costs more than the available account balance. The error
+includes a top-up link: OAuth connections receive a one-time deposit-only URL, while
+Bearer API-key users receive <https://bananabanana.pro/profile>. Open it, add funds,
+then repeat the original call. If the tool requires cost confirmation, request a fresh
+quote before sending `confirm_cost` again.
+
+You can also call the free `top_up` tool at any time. OAuth links expire after 30
+minutes and can be redeemed once. If the browser shows `410 Gone`, the link is invalid,
+expired, already used in another browser or its restricted session ended; ask the agent
+to call `top_up` again. Link issuance is limited to three per minute per credential.
+
+A completed `get_result` always reports `balance_remaining_usd`. When that balance is
+below the cheapest image price in the live application price table, it also includes a
+top-up link (or a retry delay if link issuance is temporarily limited).
 
 ### `DAILY_CAP_EXCEEDED`
 
@@ -93,7 +104,7 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 |---|---|---|
 | `INVALID_PARAMS` | Bad or incompatible arguments (e.g. 512 on a model that has no 512). | Fix params; check `list_models` for valid combinations. |
 | `NOT_FOUND` | No such `job_id` / `source_generation_id` for this account. | Verify the id with `list_generations`. |
-| `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Top up at the profile, then retry. |
+| `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Open the returned `top_up_url`, or call `top_up`, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
 | `RATE_LIMITED` | Too many tool calls. | Respect `Retry-After` when present and retry with backoff. |
 | `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
