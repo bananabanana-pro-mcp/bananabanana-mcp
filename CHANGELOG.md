@@ -6,6 +6,44 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.7] — 2026-08-20
+
+### Added
+
+- Documented all nine live tools, including `edit_video` video-to-video editing and
+  synchronous `generate_speech`.
+- Added OAuth-first setup instructions and the complete OAuth 2.1 flow, while keeping
+  Bearer API keys as the documented option for scripts and CI.
+- Added the live speech price, all current image and video prices, top-up bonuses and
+  partner promo-code bonuses.
+- Added troubleshooting guidance for `DAILY_CAP_EXCEEDED`, insufficient balance,
+  rate limits, and the `/mcp` documentation page versus the `/api/mcp` endpoint.
+
+### Changed
+
+- Corrected Omni Flash pricing to $0.10 per output second for a user-selected duration
+  of 3–10 seconds; video edits inherit or trim the source duration.
+- Clarified that Veo generation accepts 4, 6 or 8 seconds, while the seven-second
+  price entries apply to extension jobs.
+- Removed the optional `Authorization` header declaration from `server.json` so
+  OAuth-capable clients use runtime discovery. Existing Bearer API-key requests remain
+  supported by the server.
+- Updated the Registry title and description to include speech generation.
+
+## [1.0.6] — 2026-08-16
+
+### Changed
+
+- Clarified that image `relaxed_filter` selects Google's documented Vertex AI
+  presets (`safetySettings` thresholds off and adult person generation allowed); it
+  does not bypass the independent classifier that inspects finished media.
+- Clarified that retrying a legitimate output-stage rejection can still succeed
+  because each attempt renders different media, while video `relaxed_filter` is
+  near-inert because Google exposes no configurable Veo safety settings.
+
+Registry history: `1.0.5` was deprecated with status message
+“Superseded by 1.0.6 (relaxed_filter wording clarified as Google Vertex AI presets)”.
+
 ## [1.0.5] — 2026-08-16
 
 ### Changed
@@ -16,16 +54,12 @@ and the server follows [Semantic Versioning](https://semver.org/).
   only loosens the first one. Tool descriptions, the `list_models` content-filter note
   and the `get_result` failure guidance now state this explicitly and report which stage
   fired via `upstream_reason` (`SAFETY_BLOCK` = request stage, `IMAGE_SAFETY` /
-  `rai_media_filtered_reasons` = output stage). The output classifier scores each
-  rendered file on its own, so a retry on a borderline subject is still worth taking —
-  the guidance recommends it, while making clear the flag is not what unlocks that
-  stage. New reference section:
+  `rai_media_filtered_reasons` = output stage). New reference section:
   [Two filter stages](./docs/troubleshooting.md#two-filter-stages-and-what-relaxed_filter-actually-does).
-- **`relaxed_filter` on video is documented as near-inert.** Google exposes no
-  configurable safety settings for Veo; the flag can only pin
-  `personGeneration=allow_adult`, which is already the Veo 3.1 default. `generate_video`
-  still accepts it, and the tool text now points at the levers that do work for video:
-  a retry, the wording, and `veo-3.1-fast` over `omni-flash`.
+
+Registry history: `1.0.4` was deprecated with status message
+“Superseded by 1.0.5 (relaxed_filter semantics documented per Google's two filter
+stages).”
 
 ## [1.0.4] — 2026-08-01
 
@@ -72,6 +106,9 @@ and the server follows [Semantic Versioning](https://semver.org/).
   `source_duration_seconds` and — for `video_url` sources — a `source_ref` you can pass
   back with `confirm_cost` to avoid downloading the clip twice.
 
+Registry history: `1.0.3` was deprecated with status message
+“Superseded by 1.0.4 (OAuth 2.1 sign-in; Authorization header no longer required)”.
+
 ## [1.0.3] — 2026-07-16
 
 ### Added
@@ -86,6 +123,10 @@ and the server follows [Semantic Versioning](https://semver.org/).
   [`examples/generate.py`](./examples/generate.py) and
   [`examples/generate.mjs`](./examples/generate.mjs).
 
+Registry history: `1.0.2` was deprecated with status message
+“Superseded by 1.0.3 (added server icon). Endpoint unchanged:
+https://bananabanana.pro/api/mcp”.
+
 ## [1.0.2] — 2026-07-12
 
 ### Changed
@@ -96,6 +137,10 @@ and the server follows [Semantic Versioning](https://semver.org/).
   the MCP Registry as 1.0.2 (now the latest version); 1.0.1 remains available but is no
   longer latest.
 
+Registry history: `1.0.1` was deprecated with status message
+“Superseded by 1.0.2 (reworded description). Endpoint unchanged:
+https://bananabanana.pro/api/mcp”.
+
 ## [1.0.1] — 2026-07-12
 
 ### Fixed
@@ -105,14 +150,23 @@ and the server follows [Semantic Versioning](https://semver.org/).
   which is the human docs page, not the MCP endpoint). Republished to the MCP Registry
   as a new version; 1.0.0 superseded.
 
+Registry history: `1.0.0` was deprecated with status message
+“Wrong endpoint URL (docs page). Use 1.0.1:
+https://bananabanana.pro/api/mcp”.
+
 ## [1.0.0] — 2026-07-12
 
 Initial public release of the BananaBanana remote MCP server.
 
+The published Registry descriptor mistakenly used the human documentation page
+`https://bananabanana.pro/mcp` as its remote endpoint. Version 1.0.1 corrected it to
+`https://bananabanana.pro/api/mcp`.
+
 ### Server
 
-- Remote MCP server at `https://bananabanana.pro/api/mcp` over streamable HTTP
-  (stateless JSON-RPC — one request per POST, no session id).
+- Remote MCP server over streamable HTTP (stateless JSON-RPC — one request per POST,
+  no session id). The intended production endpoint was
+  `https://bananabanana.pro/api/mcp`; the Registry URL was corrected in 1.0.1.
 - Bearer API-key authentication (`bb_live_…`), keys hashed at rest and shown once.
 - Seven tools: `list_models`, `get_account`, `generate_image`, `edit_image`,
   `generate_video`, `get_result`, `list_generations`.
