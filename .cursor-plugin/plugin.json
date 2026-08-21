@@ -1,0 +1,21 @@
+{
+  "name": "bananabanana",
+  "description": "Generate images, video and speech with Nano Banana, Veo, Omni Flash and Gemini TTS — pay-as-you-go, no subscription.",
+  "version": "1.0.8",
+  "author": {
+    "name": "BananaBanana",
+    "email": "support@bananabanana.pro"
+  },
+  "logo": "https://bananabanana.pro/mcp-icon-512.png",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "BANANABANANA_API_KEY": {
+        "type": "string",
+        "title": "BananaBanana API key",
+        "description": "API key from https://bananabanana.pro/profile (API Keys section). Starts with bb_live_."
+      }
+    },
+    "required": ["BANANABANANA_API_KEY"]
+  }
+}
