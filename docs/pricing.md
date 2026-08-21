@@ -104,8 +104,8 @@ The server is built so an agent never spends by surprise:
   filter, the charge is refunded automatically (`refunded: true` in `get_result`).
 - **Speech charges after valid audio.** `generate_speech` charges only after the
   upstream model has returned valid audio.
-- **Free reads.** `list_models`, `get_account`, `get_result` and `list_generations`
-  never cost anything.
+- **Free reads.** `list_models`, `get_account`, `top_up`, `get_result` and
+  `list_generations` never cost anything.
 
 ## Spend caps & limits
 

@@ -6,6 +6,26 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added `glama.json` so the Glama catalogue can verify repository ownership
+  (maintainer `bananabanana-pro`).
+- Added a Cursor Plugin manifest — `.cursor-plugin/plugin.json` with a
+  `BANANABANANA_API_KEY` variable, plus the plugin-root `mcp.json` that points at the
+  streamable-HTTP endpoint and reads the key from that variable. No key is stored in
+  the repository.
+
+### Changed
+
+- Pointed the Cursor plugin `logo` at the hosted absolute icon URL
+  (`https://bananabanana.pro/mcp-icon-512.png`, the same asset `server.json` uses) so
+  catalogue scanners that render the card outside the repository resolve it.
+
+### Fixed
+
+- Listed `top_up` among the free tools in the "Cost transparency" section of
+  `docs/pricing.md`; the tool reference and README already counted it as free.
+
 ## [1.0.8] — 2026-08-20
 
 ### Added
