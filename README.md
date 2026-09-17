@@ -8,7 +8,7 @@ An MCP server for **image, video, and speech generation** — Google **Nano Bana
 - **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog)
 - **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog> · **Docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
 
-Generate images from $0.02, videos from $0.10, and speech for $0.01 per started 200
+Generate images from $0.03, videos from $0.10, and speech for $0.01 per started 200
 transcript characters, billed from an account balance you top up with crypto (from $1)
 or by card, PayPal or SEPA (from $20). Cost quotes before every expensive call,
 automatic refunds on failure, and one shared image/video history with the website.
@@ -158,7 +158,7 @@ Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/
 | `nano-banana-2-lite` | Image (1024) | $0.03 |
 | `nano-banana-2` | Image (512→4096) | $0.03 – $0.13 |
 | `nano-banana-pro` | Image (1024→4096) | $0.11 – $0.20 |
-| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | Image (1024→4096, OpenAI) | $0.02 – $0.13 |
+| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | Image (1024→4096, OpenAI) | $0.05 – $0.18 |
 | `qwen-image-3.0-pro` | Image (1024/2048, Alibaba) | $0.04 – $0.08 |
 | `veo-3.1-lite` | Video (720p/1080p; 4, 6 or 8 s) | $0.10 – $0.56 |
 | `veo-3.1-fast` | Video (up to 4K; 4, 6 or 8 s) | $0.35 – $2.60 |
@@ -169,7 +169,7 @@ Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/
 | `grok-imagine-video-1.5` | Video (720p/1080p, sound, 4 – 15 s) | $0.14 – $0.25 / s ($0.56 – $3.75) |
 | `gemini-3.1-flash-tts-preview` | Speech (WAV) | $0.01 / started 200 transcript characters |
 
-Images cost **$0.02–$0.20** each; video costs **$0.10–$6.00** per clip. Veo is priced
+Images cost **$0.03–$0.20** each; video costs **$0.10–$6.00** per clip. Veo is priced
 per clip, while Omni Flash, Wan 3.0 and Grok Imagine Video are billed per second of
 output at the vendor's own list rates. Veo generation accepts 4, 6 or 8 seconds; the
 7-second prices returned by `list_models` are for extension jobs, not a selectable

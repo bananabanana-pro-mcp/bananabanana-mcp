@@ -11,7 +11,7 @@ and the server follows [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Documented the image models added since 1.0.8: OpenAI **GPT Image 2.5 Flare** and
-  **Sunburst** ($0.02 at 1024, $0.08 at 2048, $0.13 at 4096; up to 14 references, no
+  **Sunburst** ($0.05 at 1024, $0.11 at 2048, $0.18 at 4096 — OpenAI's own list price; up to 14 references, no
   seed or `relaxed_filter`) and Alibaba **Qwen Image 3.0 Pro** ($0.04 at 1024, $0.08 at
   2048; up to 3 references). `generate_image` now takes prompts up to 32,000 characters
   and `reference_images` on every model; `edit_image` stays on the Nano Banana models.
@@ -21,7 +21,7 @@ and the server follows [Semantic Versioning](https://semver.org/).
   Imagine Video 1.5** (any whole 4–15 s, 720p / 1080p at xAI's own list price of
   $0.14 / $0.25 per second, native sound, five aspect ratios, an exact first frame plus
   up to 7 references — one image in total at 1080p; input images free). xAI's 480p tier
-  was sold on launch day only and is not offered.
+  is not offered.
 - Documented **Gemini Omni 1.1 Flash** as `omni-flash`: per-second pricing by resolution
   ($0.03 at 360p, $0.10 at 720p, $0.15 at 1080p, $0.30 at 4K), a last frame, and scene
   extension through `edit_video` `mode: "extend"` (3–10 s per step, 40 s in total).
@@ -43,7 +43,7 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Price ranges: images **$0.02–$0.20**, video **$0.10–$6.00** per clip (the ceiling is
+- Price ranges: images **$0.03–$0.20**, video **$0.10–$6.00** per clip (the ceiling is
   a 30-second 1080p Wan 3.0 clip). `generate_video` and `list_models` now report
   per-second prices by resolution for Omni Flash, Wan 3.0 and Grok Imagine Video.
 - Registry title and description now name GPT Image, Wan and Grok alongside Nano

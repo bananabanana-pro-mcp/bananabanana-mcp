@@ -58,8 +58,8 @@ durations and constraints. Call this before quoting a cost or choosing a model.
     { "id": "nano-banana-2-lite", "type": "image", "vendor": "google", "prices_per_image_usd": { "1024": 0.03 }, "resolutions": ["1024"], "max_reference_images": 14, "supports": { "seed": true, "negative_prompt": true, "relaxed_filter": true, "edit_image": true } },
     { "id": "nano-banana-2", "type": "image", "vendor": "google", "prices_per_image_usd": { "512": 0.03, "1024": 0.06, "2048": 0.09, "4096": 0.13 } },
     { "id": "nano-banana-pro", "type": "image", "vendor": "google", "prices_per_image_usd": { "1024": 0.11, "2048": 0.11, "4096": 0.20 } },
-    { "id": "gpt-image-2.5-flare", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.02, "2048": 0.08, "4096": 0.13 }, "supports": { "seed": false, "negative_prompt": false, "relaxed_filter": false, "edit_image": false } },
-    { "id": "gpt-image-2.5-sunburst", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.02, "2048": 0.08, "4096": 0.13 } },
+    { "id": "gpt-image-2.5-flare", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.05, "2048": 0.11, "4096": 0.18 }, "supports": { "seed": false, "negative_prompt": false, "relaxed_filter": false, "edit_image": false } },
+    { "id": "gpt-image-2.5-sunburst", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.05, "2048": 0.11, "4096": 0.18 } },
     { "id": "qwen-image-3.0-pro", "type": "image", "vendor": "alibaba", "prices_per_image_usd": { "1024": 0.04, "2048": 0.08 }, "max_reference_images": 3 }
   ],
   "video_models": [
@@ -136,7 +136,7 @@ redemption the browser is redirected to the clean `/mcp/top-up` URL.
 
 ---
 
-## `generate_image`  — paid ($0.02–$0.20 per image)
+## `generate_image`  — paid ($0.03–$0.20 per image)
 
 Start a text-to-image generation with the Google Nano Banana family, OpenAI GPT Image
 2.5 or Alibaba Qwen Image 3.0 Pro. Charges immediately for a single image and returns a

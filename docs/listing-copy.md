@@ -43,7 +43,7 @@ The server supports PKCE S256, dynamic client registration, protected-resource a
 authorization-server discovery, refresh tokens and resource indicators. Bearer API
 keys remain available for scripts, CI and clients without OAuth.
 
-Pricing is pay as you go in USD. Images cost **$0.02–$0.20 each**. New Veo generations
+Pricing is pay as you go in USD. Images cost **$0.03–$0.20 each**. New Veo generations
 cost **$0.10–$4.40 per 4-, 6- or 8-second clip**, depending on model, resolution and
 audio; seven-second price entries apply to extension jobs. The other video models are
 billed per second of output at the vendor's own list rates: Gemini Omni 1.1 Flash
@@ -71,7 +71,7 @@ expose the full profile or promo-code controls.
 | `nano-banana-2-lite` | $0.03 at 1024 |
 | `nano-banana-2` | $0.03 at 512; $0.06 at 1024; $0.09 at 2048; $0.13 at 4096 |
 | `nano-banana-pro` | $0.11 at 1024 or 2048; $0.20 at 4096 |
-| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | $0.02 at 1024; $0.08 at 2048; $0.13 at 4096 |
+| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | $0.05 at 1024; $0.11 at 2048; $0.18 at 4096 (OpenAI's own list price) |
 | `qwen-image-3.0-pro` | $0.04 at 1024; $0.08 at 2048 |
 | `veo-3.1-lite` | $0.10–$0.56 per 4/6/8-second clip |
 | `veo-3.1-fast` | $0.35–$2.60 per 4/6/8-second clip |
@@ -289,7 +289,7 @@ promo-code controls still require the fully authenticated profile.
 
 ### How much does generation cost?
 
-Images cost $0.02–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip. Omni
+Images cost $0.03–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip. Omni
 Flash costs $0.03–$0.30 per output second by resolution for 3–10 seconds, Wan 3.0
 $0.05–$0.20 per second for 4–30 seconds, Grok Imagine Video 1.5 $0.14–$0.25 per second
 for 4–15 seconds, and speech costs $0.01 per started 200 transcript characters. Run

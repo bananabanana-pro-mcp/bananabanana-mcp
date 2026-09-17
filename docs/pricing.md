@@ -49,8 +49,8 @@ effective out-of-pocket price can be lower.
 | `nano-banana-2-lite` | Google | — | $0.03 | — | — |
 | `nano-banana-2` | Google | $0.03 | $0.06 | $0.09 | $0.13 |
 | `nano-banana-pro` | Google | — | $0.11 | $0.11 | $0.20 |
-| `gpt-image-2.5-flare` | OpenAI | — | $0.02 | $0.08 | $0.13 |
-| `gpt-image-2.5-sunburst` | OpenAI | — | $0.02 | $0.08 | $0.13 |
+| `gpt-image-2.5-flare` | OpenAI | — | $0.05 | $0.11 | $0.18 |
+| `gpt-image-2.5-sunburst` | OpenAI | — | $0.05 | $0.11 | $0.18 |
 | `qwen-image-3.0-pro` | Alibaba | — | $0.04 | $0.08 | — |
 
 `nano-banana-2-lite` supports 1024 only. `nano-banana-pro` and the GPT Image models
@@ -115,7 +115,7 @@ is not a selectable generation duration.
 |---|---|---|
 | `gemini-3.1-flash-tts-preview` | **$0.01 per started 200 transcript characters** | One voice or exactly two named dialogue speakers. Returns mono 24 kHz, 16-bit WAV audio synchronously. |
 
-**Overall ranges:** images **$0.02–$0.20** each; video **$0.10–$6.00** per clip (Veo per
+**Overall ranges:** images **$0.03–$0.20** each; video **$0.10–$6.00** per clip (Veo per
 clip; Omni Flash $0.03–$0.30/s, Wan 3.0 $0.05–$0.20/s, Grok Imagine Video $0.14–$0.25/s);
 speech **$0.01 per started 200 transcript characters**.
 
