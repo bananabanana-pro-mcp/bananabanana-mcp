@@ -6,20 +6,54 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.9] — 2026-09-17
+
 ### Added
 
+- Documented the image models added since 1.0.8: OpenAI **GPT Image 2.5 Flare** and
+  **Sunburst** ($0.02 at 1024, $0.08 at 2048, $0.13 at 4096; up to 14 references, no
+  seed or `relaxed_filter`) and Alibaba **Qwen Image 3.0 Pro** ($0.04 at 1024, $0.08 at
+  2048; up to 3 references). `generate_image` now takes prompts up to 32,000 characters
+  and `reference_images` on every model; `edit_image` stays on the Nano Banana models.
+- Documented the video models added since 1.0.8: Alibaba **Wan 3.0** (4–30 s, 480p to
+  1080p at $0.05 / $0.10 / $0.20 per second, free optional audio, first and last frame,
+  seed, and up to 5 reference videos billed together with the output) and xAI **Grok
+  Imagine Video 1.5** (any whole 4–15 s, 480p / 720p / 1080p at xAI's own list price of
+  $0.08 / $0.14 / $0.25 per second, native sound, five aspect ratios, an exact first
+  frame plus up to 7 references — one image in total at 1080p; input images free).
+- Documented **Gemini Omni 1.1 Flash** as `omni-flash`: per-second pricing by resolution
+  ($0.03 at 360p, $0.10 at 720p, $0.15 at 1080p, $0.30 at 4K), a last frame, and scene
+  extension through `edit_video` `mode: "extend"` (3–10 s per step, 40 s in total).
+  The previous generation remains available as `omni-flash-1.0` ($0.10 at 720p, $0.12
+  at upscaled 1080p, 4/6/8/10 s).
+- Documented the new `generate_video` parameters `last_frame` and `reference_videos`,
+  and the new `edit_video` parameters `model`, `mode`, `resolution`, `with_audio` and
+  `reference_images`.
+- Documented **card, PayPal and SEPA top-ups** (from $20, processed inside PayPal's
+  checkout) next to crypto (from $1). Bonuses apply to both; the OAuth `top_up`
+  deposit-only page takes either.
 - Added `glama.json` so the Glama catalogue can verify repository ownership
   (maintainer `bananabanana-pro`).
 - Added a Cursor Plugin manifest — `.cursor-plugin/plugin.json` with a
   `BANANABANANA_API_KEY` variable, plus the plugin-root `mcp.json` that points at the
   streamable-HTTP endpoint and reads the key from that variable. No key is stored in
   the repository.
+- Added the LobeHub owner manifest `lhm.plugin.json` with the live tool catalogue.
 
 ### Changed
 
+- Price ranges: images **$0.02–$0.20**, video **$0.10–$6.00** per clip (the ceiling is
+  a 30-second 1080p Wan 3.0 clip). `generate_video` and `list_models` now report
+  per-second prices by resolution for Omni Flash, Wan 3.0 and Grok Imagine Video.
+- Registry title and description now name GPT Image, Wan and Grok alongside Nano
+  Banana, Veo, Omni and Gemini TTS; the wording "crypto only / no credit card" was
+  replaced by "crypto or card" everywhere.
 - Pointed the Cursor plugin `logo` at the hosted absolute icon URL
   (`https://bananabanana.pro/mcp-icon-512.png`, the same asset `server.json` uses) so
   catalogue scanners that render the card outside the repository resolve it.
+- `SAFETY_FILTERED` is now described as the vendor's filter (Google, OpenAI, Alibaba or
+  xAI depending on the model); the two-stage explanation and `relaxed_filter` still
+  apply to the Google models only.
 
 ### Fixed
 

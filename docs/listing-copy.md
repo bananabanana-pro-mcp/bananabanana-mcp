@@ -6,16 +6,18 @@ source for the current model catalogue and price matrix.
 
 ## Short description (90 characters)
 
-Generate images, video & speech with Nano Banana, Veo, Omni and Gemini TTS. Pay as you go.
+Images, video & speech: Nano Banana, GPT Image, Veo, Omni, Wan, Grok, Gemini TTS. Pay as you go.
 
 This is identical to the `description` in `server.json`.
 
 ## Medium description
 
 BananaBanana is a hosted remote MCP server for image generation and editing, video
-generation and video-to-video editing, and speech generation. It combines Nano Banana,
-Veo, Omni Flash and Gemini TTS behind ten tools, with OAuth 2.1 sign-in, pay-as-you-go
-pricing, cost confirmation before every video job, and automatic refunds on failure.
+generation and video-to-video editing, and speech generation. It combines Google Nano
+Banana, Veo 3.1 and Gemini Omni, OpenAI GPT Image 2.5, Alibaba Qwen Image and Wan 3.0,
+xAI Grok Imagine Video and Gemini TTS behind ten tools, with OAuth 2.1 sign-in,
+pay-as-you-go pricing paid by crypto or card, cost confirmation before every video job,
+and automatic refunds on failure.
 
 ## Long description
 
@@ -27,11 +29,13 @@ Claude Code, Claude Desktop, Cursor, VS Code, Windsurf and other clients that su
 remote Streamable HTTP MCP servers.
 
 Unlike a thin wrapper around a single Gemini API, BananaBanana does not require the
-user to install a runtime or supply a Google API key. It provides one hosted endpoint
-for the Nano Banana image family, the Veo 3.1 video family, Omni Flash video generation
-and editing, and Gemini TTS. The service also owns the account balance, exact preflight
-quotes, per-credential daily spend caps, generation history and automatic refunds when
-an upstream job fails or is rejected by a content filter.
+user to install a runtime or supply a vendor API key. It provides one hosted endpoint
+for six image models (Nano Banana 2 Lite / 2 / Pro, GPT Image 2.5 Flare / Sunburst,
+Qwen Image 3.0 Pro), seven video models (Veo 3.1 / Fast / Lite, Gemini Omni 1.1 Flash
+and Omni Flash 1.0, Wan 3.0, Grok Imagine Video 1.5) with video-to-video editing and
+scene extension, and Gemini TTS. The service also owns the account balance, exact
+preflight quotes, per-credential daily spend caps, generation history and automatic
+refunds when an upstream job fails or is rejected by a content filter.
 
 Authentication is OAuth 2.1 first: add
 `https://bananabanana.pro/api/mcp`, sign in in the browser and approve the connection.
@@ -39,22 +43,26 @@ The server supports PKCE S256, dynamic client registration, protected-resource a
 authorization-server discovery, refresh tokens and resource indicators. Bearer API
 keys remain available for scripts, CI and clients without OAuth.
 
-Pricing is pay as you go in USD. Images cost **$0.03–$0.20 each**. New Veo generations
+Pricing is pay as you go in USD. Images cost **$0.02–$0.20 each**. New Veo generations
 cost **$0.10–$4.40 per 4-, 6- or 8-second clip**, depending on model, resolution and
-audio; seven-second price entries apply to extension jobs. Omni Flash costs
-**$0.10 per output second** for a user-selected 3–10 second clip, so a clip costs
-**$0.30–$1.00**; video edits inherit the source length or use a shorter requested trim.
-Gemini TTS costs **$0.01 per started 200 transcript characters**. The free
-`list_models` tool returns the current complete matrix before anything is generated.
+audio; seven-second price entries apply to extension jobs. The other video models are
+billed per second of output at the vendor's own list rates: Gemini Omni 1.1 Flash
+**$0.03–$0.30/s** by resolution (360p to 4K, 3–10 s, extendable to 40 s), Wan 3.0
+**$0.05–$0.20/s** (480p to 1080p, 4–30 s), Grok Imagine Video 1.5 **$0.08–$0.25/s**
+(480p to 1080p, 4–15 s); a clip therefore costs **$0.10–$6.00**. Video edits on Omni
+inherit the source length or use a shorter requested trim. Gemini TTS costs **$0.01 per
+started 200 transcript characters**. The free `list_models` tool returns the current
+complete matrix before anything is generated.
 
-The balance is funded with cryptocurrency. Deposits of $50 or more receive 5% extra
+The balance is funded with cryptocurrency (from $1) or by card, PayPal or SEPA (from
+$20, processed inside PayPal's checkout). Deposits of $50 or more receive 5% extra
 balance, and deposits of $100 or more receive 10% extra balance. While a partner promo
 code is active it adds another 10%; the promo and deposit bonus stack, so a $100 deposit
 with an active code credits $120. These bonuses lower the effective out-of-pocket cost
 of generations without changing their displayed balance charge. OAuth users can call
-`top_up` for a one-time 30-minute link to a deposit-only page; the restricted session
-has a two-hour sliding idle timeout and does not expose the full profile or promo-code
-controls.
+`top_up` for a one-time 30-minute link to a deposit-only page (crypto address or card
+payment); the restricted session has a two-hour sliding idle timeout and does not
+expose the full profile or promo-code controls.
 
 ## Current price summary
 
@@ -63,10 +71,15 @@ controls.
 | `nano-banana-2-lite` | $0.03 at 1024 |
 | `nano-banana-2` | $0.03 at 512; $0.06 at 1024; $0.09 at 2048; $0.13 at 4096 |
 | `nano-banana-pro` | $0.11 at 1024 or 2048; $0.20 at 4096 |
+| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | $0.02 at 1024; $0.08 at 2048; $0.13 at 4096 |
+| `qwen-image-3.0-pro` | $0.04 at 1024; $0.08 at 2048 |
 | `veo-3.1-lite` | $0.10–$0.56 per 4/6/8-second clip |
 | `veo-3.1-fast` | $0.35–$2.60 per 4/6/8-second clip |
 | `veo-3.1` | $0.70–$4.40 per 4/6/8-second clip |
-| `omni-flash` | $0.10 per output second; 3–10 seconds ($0.30–$1.00) |
+| `omni-flash` (Gemini Omni 1.1 Flash) | $0.03 / $0.10 / $0.15 / $0.30 per output second at 360p / 720p / 1080p / 4K; 3–10 seconds ($0.09–$3.00) |
+| `omni-flash-1.0` | $0.10 per second at 720p, $0.12 at 1080p; 4–10 seconds ($0.40–$1.20) |
+| `wan-3.0` | $0.05 / $0.10 / $0.20 per output second at 480p / 720p / 1080p; 4–30 seconds ($0.20–$6.00) |
+| `grok-imagine-video-1.5` | $0.08 / $0.14 / $0.25 per output second at 480p / 720p / 1080p; 4–15 seconds ($0.32–$3.75) |
 | `gemini-3.1-flash-tts-preview` | $0.01 per started 200 transcript characters |
 
 Veo prices vary by resolution and audio. Use `list_models` for every exact
@@ -79,12 +92,15 @@ model/resolution/audio combination.
 - `get_account` — show balance, credential identity, daily cap and spend today; free.
 - `top_up` — return a secure balance top-up link; OAuth gets deposit-only access and
   API-key users get the normal profile; free.
-- `generate_image` — generate one to four images with the Nano Banana family; paid.
-- `edit_image` — edit a completed image with a text instruction; paid.
-- `generate_video` — generate a Veo or Omni Flash clip, optionally using image inputs;
-  paid and always quoted before it starts.
+- `generate_image` — generate one to four images with Nano Banana, GPT Image 2.5 or
+  Qwen Image 3.0 Pro, with up to 14 reference images; paid.
+- `edit_image` — edit a completed image with a text instruction (Nano Banana); paid.
+- `generate_video` — generate a Veo, Omni Flash, Wan 3.0 or Grok Imagine Video clip,
+  optionally from a first frame, a last frame, reference images or (Wan) reference
+  videos; paid and always quoted before it starts.
 - `edit_video` — edit an existing video with Omni Flash while retaining or trimming its
-  duration; paid and always quoted before it starts.
+  duration, extend an Omni clip by 3–10 s, or rework / continue a clip on Wan 3.0; paid
+  and always quoted before it starts.
 - `generate_speech` — synchronously render one- or two-speaker Gemini TTS audio as mono
   24 kHz, 16-bit WAV; paid.
 - `get_result` — poll an asynchronous image or video job and return its media URLs,
@@ -265,24 +281,29 @@ No. Generations are charged against a prepaid balance; there is no monthly subsc
 
 ### How do I pay?
 
-Fund the balance with cryptocurrency. Deposit-size bonuses and an active partner promo
-code can add extra balance as described above. An OAuth user can ask the agent to call
-`top_up`; promo-code controls still require the fully authenticated profile.
+Fund the balance with cryptocurrency (from $1) or by card, PayPal or SEPA (from $20,
+inside PayPal's checkout). Either way it is a one-off top-up with no subscription and
+no saved card. Deposit-size bonuses and an active partner promo code can add extra
+balance as described above. An OAuth user can ask the agent to call `top_up`;
+promo-code controls still require the fully authenticated profile.
 
 ### How much does generation cost?
 
-Images cost $0.03–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip.
-Omni Flash costs $0.10 per output second for 3–10 seconds, and speech costs $0.01 per
-started 200 transcript characters. Run the free `list_models` tool for the complete
-current matrix. `generate_image` defaults to the $0.03 `nano-banana-2-lite` model at
-1024; choose `nano-banana-2` explicitly for 512, 2048 or 4096 output.
+Images cost $0.02–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip. Omni
+Flash costs $0.03–$0.30 per output second by resolution for 3–10 seconds, Wan 3.0
+$0.05–$0.20 per second for 4–30 seconds, Grok Imagine Video 1.5 $0.08–$0.25 per second
+for 4–15 seconds, and speech costs $0.01 per started 200 transcript characters. Run
+the free `list_models` tool for the complete current matrix. `generate_image` defaults
+to the $0.03 `nano-banana-2-lite` model at 1024; choose `nano-banana-2` explicitly for
+512, 2048 or 4096 output.
 
 ### Who selects the duration?
 
-The user selects 4, 6 or 8 seconds for a new Veo generation and any whole duration from
-3 through 10 seconds for Omni Flash. A seven-second Veo price applies to extension jobs,
-not to a new generation. Video edits inherit the source duration unless the user asks
-to trim it shorter.
+The user selects 4, 6 or 8 seconds for a new Veo generation, any whole duration from 3
+through 10 seconds for Omni Flash, 4 to 30 seconds for Wan 3.0 and any whole 4–15
+seconds for Grok. A seven-second Veo price applies to extension jobs, not to a new
+generation. Omni video edits inherit the source duration unless the user asks to trim
+it shorter; Omni scene extension appends 3–10 s up to 40 s in total.
 
 ### What happens if generation fails?
 
@@ -321,11 +342,13 @@ by insufficient balance or an optional daily spend cap.
   mention Bearer keys only as the fallback.
 - Refresh or rescan the tool catalogue and verify that all ten tools appear, especially
   `top_up`, `edit_video` and `generate_speech`.
-- Replace flat or model-selected Omni wording with $0.10 per user-selected output second
-  for 3–10 seconds; keep Veo at 4/6/8 seconds for new clips and note seven seconds only
-  for extension jobs.
-- Replace the payment, bonus and promo text with the canonical copy; remove references
-  to unsupported payment methods.
+- Replace flat or model-selected Omni wording with per-second pricing by resolution
+  ($0.03–$0.30/s) for a user-selected 3–10 seconds; keep Veo at 4/6/8 seconds for new
+  clips and note seven seconds only for extension jobs; list Wan 3.0 and Grok Imagine
+  Video 1.5 among the video models and GPT Image 2.5 / Qwen among the image models.
+- Replace the payment, bonus and promo text with the canonical copy: crypto from $1 or
+  card / PayPal / SEPA from $20, no subscription; remove references to Telegram Stars or
+  any other method not listed here.
 - Verify the repository, website, docs, icon and Apache-2.0 license links.
 
 ### mcp.so
@@ -336,7 +359,8 @@ by insufficient balance or an optional daily spend cap.
 - Change the visible tool count to ten and add `top_up`, `edit_video` and
   `generate_speech`; paid tools total five and free tools total five.
 - Remove the stale statements that Omni is a flat $1.00, that its duration is chosen by
-  the model, and that unsupported payment methods are available.
+  the model, that the service is crypto-only, and that Telegram Stars or other unlisted
+  payment methods are available.
 - Add speech to the title/description and add relevant speech and video-editing tags if
   the form exposes tags.
 - Verify the repository, homepage, documentation, icon, category and Apache-2.0 license.

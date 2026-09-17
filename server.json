@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "pro.bananabanana/image-video",
   "title": "BananaBanana Image, Video & Speech Generation",
-  "description": "Generate images, video & speech with Nano Banana, Veo, Omni and Gemini TTS. Pay as you go.",
-  "version": "1.0.8",
+  "description": "Images, video & speech: Nano Banana, GPT Image, Veo, Omni, Wan, Grok, Gemini TTS. Pay as you go.",
+  "version": "1.0.9",
   "websiteUrl": "https://bananabanana.pro/mcp",
   "repository": {
     "url": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",

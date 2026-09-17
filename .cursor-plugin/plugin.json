@@ -1,7 +1,7 @@
 {
   "name": "bananabanana",
-  "description": "Generate images, video and speech with Nano Banana, Veo, Omni Flash and Gemini TTS — pay-as-you-go, no subscription.",
-  "version": "1.0.8",
+  "description": "Generate images, video and speech with Nano Banana, GPT Image 2.5, Qwen Image, Veo 3.1, Gemini Omni, Wan 3.0, Grok Imagine Video and Gemini TTS — pay-as-you-go by crypto or card, no subscription.",
+  "version": "1.0.9",
   "author": {
     "name": "BananaBanana",
     "email": "support@bananabanana.pro"

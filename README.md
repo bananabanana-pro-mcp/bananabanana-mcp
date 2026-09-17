@@ -2,16 +2,16 @@
 
 [![MCP Badge](https://lobehub.com/badge/mcp/bananabanana-pro-mcp-bananabanana-mcp)](https://lobehub.com/mcp/bananabanana-pro-mcp-bananabanana-mcp)
 
-An MCP server for **image, video, and speech generation** — Google **Nano Banana**, **Veo**, **Omni**, and **Gemini TTS** models — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto payments** and **no subscription**.
+An MCP server for **image, video, and speech generation** — Google **Nano Banana**, **Veo 3.1** and **Gemini Omni**, OpenAI **GPT Image 2.5**, Alibaba **Qwen Image** and **Wan 3.0**, xAI **Grok Imagine Video** and **Gemini TTS** — that lets any MCP client (Claude Code, Claude Desktop, Cursor, and more) create media **pay-as-you-go** with **crypto or card payments** and **no subscription**.
 
 - **Endpoint:** `https://bananabanana.pro/api/mcp` (streamable HTTP)
 - **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog)
 - **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog> · **Docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
 
-Generate images from $0.03, videos from $0.10, and speech for $0.01 per started 200
-transcript characters, billed from an account balance you top up with crypto. Cost
-quotes before every expensive call, automatic refunds on failure, and one shared
-image/video history with the website.
+Generate images from $0.02, videos from $0.10, and speech for $0.01 per started 200
+transcript characters, billed from an account balance you top up with crypto (from $1)
+or by card, PayPal or SEPA (from $20). Cost quotes before every expensive call,
+automatic refunds on failure, and one shared image/video history with the website.
 
 ## Quick Start
 
@@ -133,11 +133,11 @@ Ten tools; the read-only and account-access tools are free. Full reference in
 |---|---|---|
 | `list_models` | List models with live USD prices, resolutions, durations, constraints. Free. | — |
 | `get_account` | Balance, key name, daily cap, spend today. Free. | — |
-| `top_up` | Return a balance top-up link. OAuth gets a one-time deposit-only link; API-key users get the profile URL. Free. | — |
-| `generate_image` | Text-to-image (Nano Banana 2 Lite / 2 / Pro), up to 4K, 1–4 variants. Lite is the default; choose Nano Banana 2 for resolutions above 1024. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `confirm_cost` |
-| `edit_image` | Multi-turn edit of a finished image by text instruction. | `source_generation_id`, `prompt`, `model`, `resolution` |
-| `generate_video` | Video (Veo 3.1 family or Omni Flash), optionally from a start frame and reference images. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `with_audio`, `first_frame`, `reference_images`, `confirm_cost` |
-| `edit_video` | Video-to-video editing on Omni Flash: restyle, replace objects, relight an existing clip. Always quotes first. | `prompt`, `source_generation_id` or `video_url`, `duration`, `audio_prompt`, `confirm_cost` |
+| `top_up` | Return a balance top-up link (crypto or card). OAuth gets a one-time deposit-only link; API-key users get the profile URL. Free. | — |
+| `generate_image` | Text-to-image on Nano Banana 2 Lite / 2 / Pro, GPT Image 2.5 Flare / Sunburst or Qwen Image 3.0 Pro, up to 4K, 1–4 variants, up to 14 reference images. Lite is the default. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `reference_images`, `confirm_cost` |
+| `edit_image` | Multi-turn edit of a finished image by text instruction (Nano Banana models). | `source_generation_id`, `prompt`, `model`, `resolution` |
+| `generate_video` | Video on Veo 3.1 family, Gemini Omni Flash (1.1 or 1.0), Wan 3.0 or Grok Imagine Video 1.5, optionally from a first frame, a last frame, reference images or (Wan) reference videos. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `aspect_ratio`, `with_audio`, `first_frame`, `last_frame`, `reference_images`, `reference_videos`, `confirm_cost` |
+| `edit_video` | Video-to-video: restyle, replace objects or relight an existing clip on Omni Flash, extend an Omni clip by 3–10 s (up to 40 s total), or rework / continue a clip on Wan 3.0. Always quotes first. | `prompt`, `model`, `source_generation_id` or `video_url`, `mode`, `duration`, `resolution`, `audio_prompt`, `confirm_cost` |
 | `generate_speech` | Gemini 3.1 Flash TTS speech: one speaker or a two-speaker dialogue. Returns a hosted WAV URL synchronously. | `text`, `voice`, `language_code`, `style`, `speakers` |
 | `get_result` | Poll a job; returns hosted media URLs (24 h) + cost/balance. Free. | `job_id`, `wait_seconds` |
 | `list_generations` | Recent account history (shared with the website). Free. | `limit`, `type`, `status` |
@@ -149,33 +149,41 @@ and charge nothing** until you repeat the call with `confirm_cost`.
 
 ## Pricing
 
-Pay-as-you-go in USD: per image, per Veo clip, per second for Omni Flash, and per
-started 200 transcript characters for speech. Live numbers come from `list_models`;
-full tables in [`docs/pricing.md`](./docs/pricing.md).
+Pay-as-you-go in USD: per image, per Veo clip, per second of output for Omni Flash,
+Wan 3.0 and Grok Imagine Video, and per started 200 transcript characters for speech.
+Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/pricing.md).
 
 | Model | Type | Price |
 |---|---|---|
 | `nano-banana-2-lite` | Image (1024) | $0.03 |
 | `nano-banana-2` | Image (512→4096) | $0.03 – $0.13 |
 | `nano-banana-pro` | Image (1024→4096) | $0.11 – $0.20 |
+| `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | Image (1024→4096, OpenAI) | $0.02 – $0.13 |
+| `qwen-image-3.0-pro` | Image (1024/2048, Alibaba) | $0.04 – $0.08 |
 | `veo-3.1-lite` | Video (720p/1080p; 4, 6 or 8 s) | $0.10 – $0.56 |
 | `veo-3.1-fast` | Video (up to 4K; 4, 6 or 8 s) | $0.35 – $2.60 |
 | `veo-3.1` | Video (up to 4K; 4, 6 or 8 s) | $0.70 – $4.40 |
-| `omni-flash` | Video (720p, sound, 3–10 s) | $0.10 / s ($0.30 – $1.00) |
+| `omni-flash` (Gemini Omni 1.1 Flash) | Video (360p–4K, sound, 3–10 s, extendable to 40 s) | $0.03 – $0.30 / s ($0.09 – $3.00) |
+| `omni-flash-1.0` | Video (720p/1080p, sound, 4–10 s) | $0.10 – $0.12 / s ($0.40 – $1.20) |
+| `wan-3.0` | Video (480p/720p/1080p, sound, 4 – 30 s) | $0.05 – $0.20 / s ($0.20 – $6.00) |
+| `grok-imagine-video-1.5` | Video (480p/720p/1080p, sound, 4 – 15 s) | $0.08 – $0.25 / s ($0.32 – $3.75) |
 | `gemini-3.1-flash-tts-preview` | Speech (WAV) | $0.01 / started 200 transcript characters |
 
-Images cost **$0.03–$0.20** each; video costs **$0.10–$4.40** per clip, with Omni
-Flash billed at **$0.10/s**. Veo generation accepts 4, 6 or 8 seconds; the 7-second
-prices returned by `list_models` are for extension jobs, not a selectable
-`generate_video` duration. Free tools: `list_models`, `get_account`, `top_up`,
-`get_result`, `list_generations`. Failed and content-filtered generations are refunded
-automatically.
+Images cost **$0.02–$0.20** each; video costs **$0.10–$6.00** per clip. Veo is priced
+per clip, while Omni Flash, Wan 3.0 and Grok Imagine Video are billed per second of
+output at the vendor's own list rates. Veo generation accepts 4, 6 or 8 seconds; the
+7-second prices returned by `list_models` are for extension jobs, not a selectable
+`generate_video` duration. Wan 3.0 takes a first and last frame, reference images,
+reference videos and a seed, and its audio track is free to switch off. Free tools:
+`list_models`, `get_account`, `top_up`, `get_result`, `list_generations`. Failed and
+content-filtered generations are refunded automatically.
 
 Top-up bonuses can lower the effective cost: deposits of $50+ receive 5% extra
 balance, deposits of $100+ receive 10%, and an active partner promo code adds another
-10%. Bonuses stack. The table shows nominal generation charges; effective
-out-of-pocket cost depends on the top-up bonus. Promo codes require a normal signed-in
-profile and are intentionally unavailable in an OAuth deposit-only session.
+10%. Bonuses stack and apply to crypto and card deposits alike. The table shows nominal
+generation charges; effective out-of-pocket cost depends on the top-up bonus. Promo
+codes require a normal signed-in profile and are intentionally unavailable in an OAuth
+deposit-only session.
 
 ## Why this instead of a subscription service
 
@@ -187,9 +195,11 @@ profile and are intentionally unavailable in an OAuth deposit-only session.
 - **Failures don't cost you.** Upstream errors and content-filter rejections are
   refunded automatically; optional per-key daily caps and `idempotency_key` bound the
   downside further.
-- **Crypto top-ups, no card required.** Deposits of $50+ / $100+ receive 5% / 10%
-  extra balance, and an active partner promo code adds another 10%. One balance and
-  one image/video history are shared between MCP and the website.
+- **Crypto or card, no subscription.** Crypto top-ups start at $1 (USDT, USDC, DAI and
+  other coins on most networks); card, PayPal and SEPA (EU) top-ups start at $20 and run
+  inside PayPal's checkout, so card details never reach the service. Deposits of $50+ /
+  $100+ receive 5% / 10% extra balance, and an active partner promo code adds another
+  10%. One balance and one image/video history are shared between MCP and the website.
 
 ## Registry
 

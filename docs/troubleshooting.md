@@ -107,7 +107,7 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 | `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Open the returned `top_up_url`, or call `top_up`, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
 | `RATE_LIMITED` | Too many tool calls. | Respect `Retry-After` when present and retry with backoff. |
-| `SAFETY_FILTERED` | Google's content filter rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
+| `SAFETY_FILTERED` | The vendor's content filter (Google, OpenAI, Alibaba or xAI, depending on the model) rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
 | `UPSTREAM_FAILED` | Upstream overloaded, out of quota, timed out, or an expired edit source (auto-refunded). | Retry in a minute or two; for edits, generate a fresh video; try a lower resolution or another model. |
 | `ACCOUNT_BLOCKED` | Account is blocked. | Contact support@bananabanana.pro. |
 | `MAINTENANCE` | Service under maintenance. | Retry in a few minutes. |
@@ -119,8 +119,9 @@ automatically** — the `get_result` payload shows `refunded: true` and the rest
 
 ## Two filter stages, and what `relaxed_filter` actually does
 
-Google applies **two independent filters** to every generation, and only the first
-one is configurable:
+Google applies **two independent filters** to every generation on its models, and
+only the first one is configurable (GPT Image, Qwen, Wan and Grok run their vendors'
+own filters, which have no switch at all — a rejection there is refunded the same way):
 
 | Stage | When it runs | Typical `upstream_reason` | Configurable? |
 |---|---|---|---|

@@ -91,9 +91,10 @@ add funds. Call the free `top_up` tool:
 
 It returns a one-time browser URL tied to the current account and credential. The URL
 is valid for **30 minutes** and creates a restricted **deposit-only** session whose
-idle timeout is **two hours**, sliding while the user checks the balance or waits for a
-cryptocurrency transfer. The restricted page can show the balance and deposit address,
-but cannot expose API keys, profile data, generation history or promo-code controls.
+idle timeout is **two hours**, sliding while the user checks the balance, waits for a
+cryptocurrency transfer or completes a card payment. The restricted page can show the
+balance, a crypto deposit address and the card / PayPal checkout, but cannot expose API
+keys, profile data, generation history or promo-code controls.
 
 Only a SHA-256 hash of each URL and session secret is stored. The raw URL token is not
 written to nginx access logs, and redemption immediately redirects to a clean URL. A

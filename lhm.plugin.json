@@ -1,0 +1,665 @@
+{
+  "author": "BananaBanana",
+  "authorUrl": "https://github.com/bananabanana-pro-mcp",
+  "category": "media-generate",
+  "cloudEndpoint": "https://bananabanana.pro/api/mcp",
+  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.02, video from $0.10, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
+  "homepage": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
+  "icon": "https://bananabanana.pro/mcp-icon-512.png",
+  "identifier": "bananabanana-pro-mcp-bananabanana-mcp",
+  "name": "BananaBanana MCP Server",
+  "tags": [
+    "image-generation",
+    "video-generation",
+    "text-to-speech",
+    "nano-banana",
+    "gpt-image",
+    "veo",
+    "omni-flash",
+    "wan",
+    "grok",
+    "gemini",
+    "pay-as-you-go",
+    "oauth"
+  ],
+  "tools": [
+    {
+      "name": "list_models",
+      "description": "List all available image, video and speech generation models with current per-unit USD prices, supported resolutions, durations and constraints. Prices come from the same source as the website — call this before quoting costs to a user or choosing a model. Free, no charge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_account",
+      "description": "Get the current account balance (USD), this API key's name, optional daily spend cap and how much of it is used today. Free, no charge. Use it to check affordability before starting expensive generations. When the balance no longer covers even the cheapest image, the response also carries a ready-to-open top_up_url.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "top_up",
+      "description": "Get a balance top-up link. OAuth connections receive a one-time deposit-only link valid for 30 minutes; opening it cannot expose API keys, profile data or generation history. Bearer API-key users receive the normal profile link. Free, no charge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_image",
+      "description": "Start an AI image generation (Google Nano Banana family, OpenAI GPT Image 2.5, Alibaba Qwen-Image 3.0 Pro). Charges the account balance immediately and returns a job_id — poll get_result for the finished image URLs. Typical completion: 10–60 seconds. The default nano-banana-2-lite model is the cheapest Google option and produces 1024px images; choose nano-banana-2 explicitly for 512px, 2048px or 4096px output. Optional reference_images provide the model with the actual subject, product, character or style pixels; Nano Banana Pro supports up to 14 references (per-model limits in list_models). Costs $0.02–$0.20 per image depending on model and resolution (see list_models). Failed generations are automatically refunded. If a legitimate prompt is rejected by Google's content filter, retry with relaxed_filter: true. Generating several images at once (number_of_images > 1) is a batch: the first call returns a price quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to start. Example: {\"prompt\": \"studio photo of a ceramic mug on linen, soft daylight\", \"model\": \"nano-banana-2-lite\", \"aspect_ratio\": \"4:5\", \"resolution\": \"1024\"}",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "description": "What to generate. English works best. Length limit depends on the model — 32000 characters on every image model here; list_models reports max_prompt_chars for each."
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "nano-banana-2-lite",
+              "nano-banana-2",
+              "nano-banana-pro",
+              "gpt-image-2.5-flare",
+              "gpt-image-2.5-sunburst",
+              "qwen-image-3.0-pro"
+            ],
+            "default": "nano-banana-2-lite",
+            "description": "nano-banana-2-lite: cheapest Google default, 1024 only. nano-banana-2: choose for 512, 2048 or 4096 output. nano-banana-pro: top Google quality, up to 4K. gpt-image-2.5-flare / gpt-image-2.5-sunburst: OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096 (4K = 3840 on the long side); Flare is the fast 2.5 tier, Sunburst the precision tier; they ignore seed and relaxed_filter. qwen-image-3.0-pro: Alibaba — crisp small text, dense layouts (posters, menus, UI); 1024 or 2048 only, up to 3 references, seed + negative_prompt. Cheapest per image: gpt-image-2.5-flare at $0.02."
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": [
+              "1:1",
+              "3:2",
+              "2:3",
+              "4:3",
+              "3:4",
+              "4:5",
+              "5:4",
+              "9:16",
+              "16:9",
+              "21:9"
+            ],
+            "default": "1:1"
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "512",
+              "1024",
+              "2048",
+              "4096"
+            ],
+            "default": "1024",
+            "description": "Lite requires 1024. Choose nano-banana-2 for 512, 2048 or 4096; 4096 costs the most. GPT Image models have no 512; qwen-image-3.0-pro accepts 1024 or 2048 only."
+          },
+          "number_of_images": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1,
+            "description": "Variants per call. >1 requires confirm_cost."
+          },
+          "negative_prompt": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "output_format": {
+            "type": "string",
+            "enum": [
+              "jpeg",
+              "png",
+              "webp"
+            ],
+            "default": "jpeg"
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647,
+            "description": "For reproducible results."
+          },
+          "reference_images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 14,
+            "description": "Actual visual references for the generated image. Each item is a job_id of a completed image generation on this account, a public http(s) image URL, or an inline data:image/png|jpeg|webp;base64,... URL (max 10 MB each). For a local file, read and base64-encode its bytes into a data URL; a bare local path such as C:\\\\photo.jpg cannot be read by this remote server."
+          },
+          "relaxed_filter": {
+            "type": "boolean",
+            "default": false,
+            "description": "Switch this call to Google's own permissive presets: safety thresholds OFF and person generation allowed for adults (safetySettings and personGeneration=ALLOW_ADULT — documented Vertex AI parameters, not a way around Google's rules). Google filters in two independent stages and this flag only affects the first: (1) a check on the request before anything is rendered — this is what refuses legitimate prompts about real-looking people, swimwear or sportswear, medical and anatomical subjects, mild fictional violence and edgy artwork (upstream_reason SAFETY_BLOCK), and it is the stage relaxed_filter relaxes; (2) a classifier that scores the finished image, which no parameter can switch off (upstream_reason IMAGE_SAFETY). Stage 2 judges the actual pixels and every run renders a different image, so a borderline but legitimate subject rejected there often passes on a plain retry or with slightly less ambiguous wording — retrying is reasonable (failures are fully refunded, so an attempt costs only time), just don't expect the flag itself to bypass that stage. What Google refuses outright — sexual content, minors, real public figures — stays blocked in every attempt. A third, separate verdict is upstream_reason SAFETY_INPUT_IMAGE: Google refused the image you supplied as input (first frame or reference). That one is deterministic — the same file always scores the same, so no flag and no retry helps; send a different image. All of them surface as error_code SAFETY_FILTERED; upstream_reason in get_result tells them apart."
+          },
+          "confirm_cost": {
+            "type": "number",
+            "description": "Required for batches (number_of_images > 1): the quoted total USD cost you accept."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Optional unique key; retries with the same key never double-charge."
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "edit_image",
+      "description": "Edit / refine a previously generated image with a text instruction on Nano Banana 2 Lite / 2 / Pro (multi-turn editing: change colors, remove objects, restyle, etc.). This tool modifies an image that already exists — use generate_image to create a new image from a prompt. Pass the job_id of a COMPLETED image generation as source_generation_id. Charged like a single image of the chosen model/resolution; auto-refund on failure. Example: {\"source_generation_id\": \"cmxyz...\", \"prompt\": \"make the background pure white and add soft shadow\"}",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "source_generation_id": {
+            "type": "string",
+            "description": "job_id of a completed image generation owned by this account."
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "description": "The edit instruction (up to 32000 characters)."
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "nano-banana-2-lite",
+              "nano-banana-2",
+              "nano-banana-pro"
+            ],
+            "default": "nano-banana-2"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": [
+              "1:1",
+              "3:2",
+              "2:3",
+              "4:3",
+              "3:4",
+              "4:5",
+              "5:4",
+              "9:16",
+              "16:9",
+              "21:9"
+            ],
+            "default": "1:1"
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "512",
+              "1024",
+              "2048",
+              "4096"
+            ],
+            "default": "1024"
+          },
+          "output_format": {
+            "type": "string",
+            "enum": [
+              "jpeg",
+              "png",
+              "webp"
+            ],
+            "default": "jpeg"
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "relaxed_filter": {
+            "type": "boolean",
+            "default": false,
+            "description": "Switch this call to Google's own permissive presets: safety thresholds OFF and person generation allowed for adults (safetySettings and personGeneration=ALLOW_ADULT — documented Vertex AI parameters, not a way around Google's rules). Google filters in two independent stages and this flag only affects the first: (1) a check on the request before anything is rendered — this is what refuses legitimate prompts about real-looking people, swimwear or sportswear, medical and anatomical subjects, mild fictional violence and edgy artwork (upstream_reason SAFETY_BLOCK), and it is the stage relaxed_filter relaxes; (2) a classifier that scores the finished image, which no parameter can switch off (upstream_reason IMAGE_SAFETY). Stage 2 judges the actual pixels and every run renders a different image, so a borderline but legitimate subject rejected there often passes on a plain retry or with slightly less ambiguous wording — retrying is reasonable (failures are fully refunded, so an attempt costs only time), just don't expect the flag itself to bypass that stage. What Google refuses outright — sexual content, minors, real public figures — stays blocked in every attempt. A third, separate verdict is upstream_reason SAFETY_INPUT_IMAGE: Google refused the image you supplied as input (first frame or reference). That one is deterministic — the same file always scores the same, so no flag and no retry helps; send a different image. All of them surface as error_code SAFETY_FILTERED; upstream_reason in get_result tells them apart."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "source_generation_id",
+          "prompt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_video",
+      "description": "Start an AI video generation (Google Veo 3.1 family, Gemini Omni Flash, Alibaba Wan 3.0 or xAI Grok Imagine Video 1.5). EXPENSIVE: $0.10–$6.00 per clip. Cost confirmation is mandatory: the first call always returns a USD quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to actually start. Returns a job_id; poll get_result (videos take 1–10+ minutes). Failed generations are auto-refunded. Models: veo-3.1-fast (default, good quality/price), veo-3.1 (best Veo quality), veo-3.1-lite (cheapest, 720p/1080p), wan-3.0 (Alibaba Wan 3.0 — clips up to 30 s, 480p/720p/1080p, optional audio, first and last frame, seed, and VIDEO INPUTS via reference_videos: edit a clip, continue its story or carry its characters into a new scene, all driven by the prompt), grok-imagine-video-1.5 (xAI Grok Imagine Video 1.5 — 4–15 s at any whole second, 480p/720p/1080p, native sound always on, flat $0.08/s at every resolution, aspect ratios 16:9 / 9:16 / 1:1 / 3:2 / 2:3, first_frame plus up to 7 reference_images — one image only at 1080p; no seed, last frame or video input), omni-flash (Gemini Omni 1.1 Flash — always has sound, 3–10 s, priced per second by resolution — $0.03/s at 360p up to $0.30/s at 4k; supports a last frame for interpolation, conversational editing via edit_from_generation_id, and scene extension via edit_video mode=extend), omni-flash-1.0 (the previous Omni generation, kept as an option: 720p at $0.10/s or 1080p upscaled at $0.12/s, 4/6/8/10 s, conversational editing, no last frame / scene extension / video references). Content filtering differs by model: omni-flash is by far the strictest, so a clip rejected as SAFETY_FILTERED on omni-flash is often produced by veo-3.1-fast without changing a word. Video has no configurable safety settings on Google's side (relaxed_filter is accepted for Veo but only pins its default personGeneration=allow_adult), and refused clips are refunded, so a retry is cheap in money and expensive only in time. Image inputs: first_frame animates a still picture, reference_images keep a subject/style consistent — both accept a job_id of a completed image generation on this account, a public image URL, or inline base64 image data, and on omni-flash they can be combined (up to 10 images total). Example: {\"prompt\": \"drone shot over a misty pine forest at sunrise\", \"model\": \"veo-3.1-fast\", \"duration\": 8, \"resolution\": \"720p\", \"confirm_cost\": 0.70}",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "description": "What to film. The limit differs per model: 2000 characters on veo-3.1*, 20000 on omni-flash and wan-3.0, 2048 on grok-imagine-video-1.5. list_models reports max_prompt_chars for each."
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "veo-3.1",
+              "veo-3.1-fast",
+              "veo-3.1-lite",
+              "omni-flash",
+              "omni-flash-1.0",
+              "wan-3.0",
+              "grok-imagine-video-1.5"
+            ],
+            "default": "veo-3.1-fast"
+          },
+          "duration": {
+            "type": "integer",
+            "enum": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              20,
+              30
+            ],
+            "default": 8,
+            "description": "Clip length in seconds. Veo accepts only 4, 6 or 8; omni-flash accepts 3, 4, 5, 6, 7, 8, 9, 10; omni-flash-1.0 accepts 4, 6, 8, 10 (1080p: 6, 8, 10); wan-3.0 accepts 4, 6, 8, 10, 15, 20, 30; grok-imagine-video-1.5 accepts 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15."
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "360p",
+              "720p",
+              "1080p",
+              "4k",
+              "480p"
+            ],
+            "default": "720p",
+            "description": "wan-3.0: 480p / 720p / 1080p; grok-imagine-video-1.5: 480p / 720p / 1080p. Veo: 720p / 1080p, plus 4k on veo-3.1 and veo-3.1-fast. omni-flash: 360p (draft, a third of the price and up to 60% faster), 720p (native), 1080p and 4k (upscaled). 360p is omni-flash only. omni-flash-1.0: 720p, or 1080p upscaled (6/8/10 s only)."
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16",
+              "1:1",
+              "3:2",
+              "2:3"
+            ],
+            "default": "16:9",
+            "description": "Veo and omni-flash: 16:9 or 9:16. wan-3.0: 16:9 / 9:16; grok-imagine-video-1.5: 16:9 / 9:16 / 1:1 / 3:2 / 2:3."
+          },
+          "with_audio": {
+            "type": "boolean",
+            "default": false,
+            "description": "Native audio for Veo models (costs more). omni-flash and grok-imagine-video-1.5 always have audio. On wan-3.0 audio is on by default and free — pass false for a silent clip."
+          },
+          "audio_prompt": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Describe the desired sound (used when audio is on)."
+          },
+          "negative_prompt": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "What to avoid. On omni-flash it is appended to the prompt as plain text (the model has no separate negative field)."
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647,
+            "description": "Veo and wan-3.0 only."
+          },
+          "first_frame": {
+            "type": "string",
+            "description": "Start the clip from a still image, which is then animated. Either a job_id of a completed image generation on this account (see list_generations), a public http(s) image URL, or an inline data:image/png|jpeg|webp;base64,... URL for a local file (max 10 MB; a bare local filesystem path cannot be read by this remote server). This includes a signed URL returned by get_result, which is how you pick one variant of a multi-image generation. On omni-flash it can be combined with reference_images; on Veo it cannot."
+          },
+          "last_frame": {
+            "type": "string",
+            "description": "Closing frame for Veo, omni-flash 1.1, and models that advertise last-frame support: the model interpolates from first_frame to this image. Requires first_frame. Same accepted forms as first_frame (job_id, public URL or base64 data URL). omni-flash-1.0 does not support it."
+          },
+          "reference_images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "description": "Reference images that keep a subject, character or style consistent (they are NOT used as literal frames). Each item is a job_id of a completed image generation on this account, a public http(s) image URL, or an inline data:image/png|jpeg|webp;base64,... URL. For a local file, pass a base64 data URL rather than its filesystem path. omni-flash: up to 10 images in total together with first_frame and last_frame. Veo 3.1 / Fast: at most 3, only with duration 8 and without frames. Veo 3.1 Lite: unsupported. grok-imagine-video-1.5: up to 7 together with first_frame (only 1 image in total at 1080p)."
+          },
+          "reference_videos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 5,
+            "description": "wan-3.0 only: clips the model reads before generating — to restyle or rework a clip, continue its story, or carry its characters, motion and setting into a new scene; what to do with them is said in the prompt, where they are \"Video 1\", \"Video 2\" in order (job_ids are numbered first, then URLs). Each item is a job_id of a completed video on this account, a public http(s) video URL, or a reference_video_refs value returned by the quote (reuses the already downloaded clip). Up to 5 clips and 15 s of video in total (each clip is normalised to MP4 720p and whole seconds, longer clips are trimmed). INPUT SECONDS ARE BILLED like output seconds — the provider charges for both — and video in + video out must fit in 30 s. Cannot be combined with first_frame / last_frame; reference_images are fine. For a single-clip edit or continuation edit_video with model wan-3.0 is the simpler call."
+          },
+          "edit_from_generation_id": {
+            "type": "string",
+            "description": "omni-flash / omni-flash-1.0 only: job_id of a completed omni video to refine conversationally; prompt describes the changes. Duration, aspect ratio, the scene and the Omni generation that shot the clip are inherited from it — duration is ignored here (use edit_video to shorten a clip)."
+          },
+          "relaxed_filter": {
+            "type": "boolean",
+            "default": false,
+            "description": "Veo only (omni-flash ignores it), and much weaker than its image counterpart: Google's video API exposes no configurable safety settings at all, so this flag can do only one thing — pin personGeneration=allow_adult, which is already the default for Veo 3.1 here. Expect it to change little. Video is filtered both before generation and again on the finished clip (rai_media_filtered_reasons), and neither check can be turned off. When a clip is refused, the levers that actually work are: retry (each run renders different footage, and failures are fully refunded), reword the people-related part of the prompt, or move an omni-flash idea to veo-3.1-fast, whose filter is noticeably looser."
+          },
+          "confirm_cost": {
+            "type": "number",
+            "description": "The quoted USD cost you accept. Omit on the first call to get the quote."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Optional unique key; retries with the same key never double-charge."
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "edit_video",
+      "description": "Edit an EXISTING video (video-to-video). Default model omni-flash (Gemini Omni Flash): restyle it, replace or add objects, relight the scene, change the mood — motion and composition of the source clip are preserved. Billed by output length at $0.10/s; cost confirmation is mandatory (first call returns the quote and charges nothing). With model \"wan-3.0\" (Alibaba Wan 3.0) the source is read as a reference (up to 15 s): mode \"edit\" rebuilds the scene as the prompt says (framing follows the source, you pick the output length and resolution), mode \"extend\" shoots the next scene with the same characters and setting — a story continuation, not a frame-exact extension. Wan bills the SOURCE SECONDS TOGETHER WITH THE OUTPUT (the provider charges for both) and source + output must fit in 30 s. Source: either source_generation_id (a completed video from this account — see list_generations) or video_url (public http(s) link, max 200 MB). The source is normalised to MP4 720p and, for mode \"edit\", the FIRST 10 SECONDS (model limit); output is 720p with sound, aspect ratio follows the source. OUTPUT LENGTH ALWAYS EQUALS SOURCE LENGTH (the model cannot stretch or shorten a clip), so duration only works downwards: it trims the source to the first N seconds. Omit duration to edit the whole clip — the quote tells you the resolved length. mode: \"extend\" instead appends a continuation to the end of the clip — duration is then the LENGTH OF THE APPENDED PART (3–10 s), the source plays first and the total is capped at 40 s. Extension reads the WHOLE source (up to 37 s), so extensions chain: extend the result again until 40 s. Extension is billed on the full resulting length. With mode \"extend\", reference_images can bring a subject or product into the continuation (\"the character from the reference image enters the scene\"). Returns a job_id; poll get_result. Failed edits are auto-refunded. Example: {\"prompt\": \"make the whole scene look like a pencil sketch, keep the motion identical\", \"source_generation_id\": \"clx…\", \"confirm_cost\": 1}",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 32000,
+            "description": "What to change in the video (up to 20000 characters)."
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "omni-flash",
+              "omni-flash-1.0",
+              "wan-3.0"
+            ],
+            "default": "omni-flash",
+            "description": "omni-flash (Gemini Omni 1.1) keeps the motion and length of the source and can extend the scene; omni-flash-1.0 is the previous generation (edit only, same length); wan-3.0 reads the source as a reference and renders a new clip of the chosen duration (edit or extend by prompt)."
+          },
+          "source_generation_id": {
+            "type": "string",
+            "description": "job_id of a completed video generation on this account."
+          },
+          "video_url": {
+            "type": "string",
+            "description": "Public http(s) URL of the source video (mp4/mov/webm/mkv/avi/wmv/flv/3gpp, max 200 MB). Use instead of source_generation_id."
+          },
+          "source_ref": {
+            "type": "string",
+            "description": "Returned by the quote when video_url is used: pass it back with confirm_cost to reuse the already downloaded clip instead of downloading it again."
+          },
+          "duration": {
+            "type": "integer",
+            "enum": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              15,
+              20,
+              30
+            ],
+            "description": "omni-flash with mode \"edit\": trim the source to the first N seconds and edit only that part; values above the source length are ignored. With mode \"extend\": the length of the appended continuation (3–10 s). wan-3.0: the length of the OUTPUT clip — 4, 6, 8, 10, 15, 20, 30 s (default 8); source + output must fit in 30 s."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "edit",
+              "extend"
+            ],
+            "default": "edit",
+            "description": "\"edit\" rewrites the clip; \"extend\" continues it. omni-flash: edit keeps the length, extend appends a 3–10 s continuation (total capped at 40 s). wan-3.0: edit rebuilds the scene at the chosen duration, extend shoots the next scene."
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "480p",
+              "720p",
+              "1080p"
+            ],
+            "description": "wan-3.0 only: output resolution (default 720p). omni-flash edits are always 720p."
+          },
+          "with_audio": {
+            "type": "boolean",
+            "default": true,
+            "description": "wan-3.0 only: sound is on by default and free — pass false for a silent clip. omni-flash always generates audio."
+          },
+          "audio_prompt": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Describe the desired sound — Omni Flash always generates audio."
+          },
+          "reference_images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "description": "omni-flash with mode \"extend\" only: images of subjects, products or characters the continuation should bring into the scene — a completed image job_id, a public http(s) URL, or a data:image/...;base64,... value (≤10 MB). Refer to them in the prompt (\"the item from the reference image enters the frame\"). Ignored by mode \"edit\" and by wan-3.0."
+          },
+          "confirm_cost": {
+            "type": "number",
+            "description": "The quoted USD cost you accept. Omit on the first call to get the quote."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Optional unique key; retries with the same key never double-charge."
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "generate_speech",
+      "description": "Generate natural speech with Gemini 3.1 Flash TTS Preview. This synchronous tool returns a hosted WAV URL directly (no get_result polling). Supports one voice or an exactly two-speaker dialogue, automatic language detection or a BCP-47 language_code, natural-language direction for accent/tone/pace, and inline performance tags such as [whispers], [laughs], [very slow] and [excited]. Price is $0.01 per started 200 transcript characters; the account is charged only after Google has returned valid audio. Example: {\"text\":\"[cheerfully] Welcome to BananaBanana!\",\"voice\":\"Kore\",\"style\":\"Warm product announcement, medium pace.\"}",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 6000,
+            "description": "Exact transcript to speak. For dialogue, prefix every turn with the matching speaker name, e.g. Sam: Hello."
+          },
+          "style": {
+            "type": "string",
+            "maxLength": 1500,
+            "description": "Optional overall direction: persona, scene, emotion, accent, pace, pronunciation and delivery notes."
+          },
+          "voice": {
+            "type": "string",
+            "enum": [
+              "Achernar",
+              "Achird",
+              "Algenib",
+              "Algieba",
+              "Alnilam",
+              "Aoede",
+              "Autonoe",
+              "Callirrhoe",
+              "Charon",
+              "Despina",
+              "Enceladus",
+              "Erinome",
+              "Fenrir",
+              "Gacrux",
+              "Iapetus",
+              "Kore",
+              "Laomedeia",
+              "Leda",
+              "Orus",
+              "Pulcherrima",
+              "Puck",
+              "Rasalgethi",
+              "Sadachbia",
+              "Sadaltager",
+              "Schedar",
+              "Sulafat",
+              "Umbriel",
+              "Vindemiatrix",
+              "Zephyr",
+              "Zubenelgenubi"
+            ],
+            "default": "Kore",
+            "description": "Single-speaker voice. Ignored when speakers is provided."
+          },
+          "language_code": {
+            "type": "string",
+            "description": "Optional language/locale such as en-US, ru-RU, ja-JP or es-MX. Omit for automatic detection."
+          },
+          "speakers": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "Exactly two dialogue speakers. Their names must prefix the turns in text.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "voice": {
+                  "type": "string",
+                  "enum": [
+                    "Achernar",
+                    "Achird",
+                    "Algenib",
+                    "Algieba",
+                    "Alnilam",
+                    "Aoede",
+                    "Autonoe",
+                    "Callirrhoe",
+                    "Charon",
+                    "Despina",
+                    "Enceladus",
+                    "Erinome",
+                    "Fenrir",
+                    "Gacrux",
+                    "Iapetus",
+                    "Kore",
+                    "Laomedeia",
+                    "Leda",
+                    "Orus",
+                    "Pulcherrima",
+                    "Puck",
+                    "Rasalgethi",
+                    "Sadachbia",
+                    "Sadaltager",
+                    "Schedar",
+                    "Sulafat",
+                    "Umbriel",
+                    "Vindemiatrix",
+                    "Zephyr",
+                    "Zubenelgenubi"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "voice"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Optional unique key; retries with the same key never double-charge."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_result",
+      "description": "Get the status and result of a generation job started with generate_image / edit_image / generate_video / edit_video. Waits up to wait_seconds for completion before returning (long-poll). On success returns hosted media URLs (valid 24 h — call again for fresh links), cost_charged_usd and balance_remaining_usd, plus a small inline preview for images. Free, no charge. Poll roughly every 10–15 s for videos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "wait_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "default": 15,
+            "description": "How long to wait server-side before answering."
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_generations",
+      "description": "List this account's recent generations (both MCP and website) — id, type, model, status, cost and prompt preview. Use it to find a job_id to re-download results or to pick a source for edit_image / edit_video / generate_video edit_from_generation_id. Free, no charge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "video"
+            ],
+            "description": "Filter by media type."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing",
+              "completed",
+              "failed"
+            ],
+            "description": "Filter by status."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "version": "1.0.9"
+}
