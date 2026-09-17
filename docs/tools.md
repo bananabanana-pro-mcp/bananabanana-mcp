@@ -65,7 +65,7 @@ durations and constraints. Call this before quoting a cost or choosing a model.
   "video_models": [
     { "id": "veo-3.1", "type": "video", "prices_usd": { "silent": { "720p": { "4": 0.70, "6": 1.05, "8": 1.40 } }, "with_audio": { "720p": { "4": 1.50, "6": 2.25, "8": 3.00 } } }, "durations_seconds": [4, 6, 8] },
     { "id": "wan-3.0", "type": "video", "prices_usd_per_second_by_resolution": { "480p": 0.05, "720p": 0.10, "1080p": 0.20 }, "durations_seconds": [4, 6, 8, 10, 15, 20, 30], "video_inputs": { "max_clips": 5, "max_input_seconds": 15, "max_input_plus_output_seconds": 30 } },
-    { "id": "grok-imagine-video-1.5", "type": "video", "prices_usd_per_second_by_resolution": { "480p": 0.08, "720p": 0.14, "1080p": 0.25 }, "durations_seconds": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "aspect_ratios": ["16:9", "9:16", "1:1", "3:2", "2:3"], "max_input_images": 7, "max_input_images_by_resolution": { "1080p": 1 } },
+    { "id": "grok-imagine-video-1.5", "type": "video", "prices_usd_per_second_by_resolution": { "720p": 0.14, "1080p": 0.25 }, "durations_seconds": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "aspect_ratios": ["16:9", "9:16", "1:1", "3:2", "2:3"], "max_input_images": 7, "max_input_images_by_resolution": { "1080p": 1 } },
     { "id": "omni-flash", "name": "Gemini Omni 1.1 Flash", "type": "video", "prices_usd_per_second_by_resolution": { "360p": 0.03, "720p": 0.10, "1080p": 0.15, "4k": 0.30 }, "durations_seconds": [3, 4, 5, 6, 7, 8, 9, 10], "max_total_seconds_after_extension": 40 },
     { "id": "omni-flash-1.0", "type": "video", "prices_usd_per_second_by_resolution": { "720p": 0.10, "1080p": 0.12 }, "durations_seconds": [4, 6, 8, 10] }
   ],
@@ -244,9 +244,9 @@ videos take **1–10+ minutes**.
 | Parameter | Type | Default | Notes |
 |---|---|---|---|
 | `prompt` | string | — | **Required.** Limit per model: 2000 characters on Veo, 20000 on `omni-flash` and `wan-3.0`, 2048 on `grok-imagine-video-1.5` (`max_prompt_chars` in `list_models`). |
-| `model` | enum | `veo-3.1-fast` | `veo-3.1` (best Veo quality) · `veo-3.1-fast` (best value) · `veo-3.1-lite` (cheapest, no 4K) · `omni-flash` (Gemini Omni 1.1 Flash: always has sound, 360p–4K priced per second, last frame, conversational editing, scene extension) · `omni-flash-1.0` (previous Omni generation, 720p/1080p) · `wan-3.0` (Alibaba: up to 30 s, 480p–1080p, optional free audio, first/last frame, seed, reference videos) · `grok-imagine-video-1.5` (xAI: 4–15 s at any whole second, 480p–1080p, sound always on, five aspect ratios, exact first frame). |
+| `model` | enum | `veo-3.1-fast` | `veo-3.1` (best Veo quality) · `veo-3.1-fast` (best value) · `veo-3.1-lite` (cheapest, no 4K) · `omni-flash` (Gemini Omni 1.1 Flash: always has sound, 360p–4K priced per second, last frame, conversational editing, scene extension) · `omni-flash-1.0` (previous Omni generation, 720p/1080p) · `wan-3.0` (Alibaba: up to 30 s, 480p–1080p, optional free audio, first/last frame, seed, reference videos) · `grok-imagine-video-1.5` (xAI: 4–15 s at any whole second, 720p or 1080p, sound always on, five aspect ratios, exact first frame). |
 | `duration` | integer | `8` | Seconds. Veo: 4, 6 or 8. `omni-flash`: any whole 3–10. `omni-flash-1.0`: 4, 6, 8, 10 (1080p: 6, 8, 10). `wan-3.0`: 4, 6, 8, 10, 15, 20, 30. `grok-imagine-video-1.5`: any whole 4–15. Ignored together with `edit_from_generation_id` — a conversational edit always keeps the source clip's length. |
-| `resolution` | enum | `720p` | Veo: `720p`, `1080p`, plus `4k` on `veo-3.1` / `veo-3.1-fast`. `omni-flash`: `360p` (draft, a third of the price), `720p` (native), `1080p` and `4k` (upscaled). `omni-flash-1.0`: `720p`, or `1080p` upscaled. `wan-3.0` and `grok-imagine-video-1.5`: `480p`, `720p`, `1080p`. |
+| `resolution` | enum | `720p` | Veo: `720p`, `1080p`, plus `4k` on `veo-3.1` / `veo-3.1-fast`. `omni-flash`: `360p` (draft, a third of the price), `720p` (native), `1080p` and `4k` (upscaled). `omni-flash-1.0`: `720p`, or `1080p` upscaled. `wan-3.0`: `480p`, `720p`, `1080p`; `grok-imagine-video-1.5`: `720p`, `1080p`. |
 | `aspect_ratio` | enum | `16:9` | `16:9`, `9:16` on Veo, Omni and Wan; `grok-imagine-video-1.5` adds `1:1`, `3:2`, `2:3`. |
 | `with_audio` | boolean | `false` | Native audio for Veo (costs more). `omni-flash` and `grok-imagine-video-1.5` always have audio. On `wan-3.0` audio is on by default and free — pass `false` for a silent clip. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound (used when audio is on). |
@@ -343,13 +343,13 @@ output at 720p the price is 12 × $0.10 = $1.20.
     "prompt": "The woman looks at the camera, smiles and says: this took ten seconds. Natural handheld motion.",
     "model": "grok-imagine-video-1.5",
     "duration": 5,
-    "resolution": "480p",
+    "resolution": "720p",
     "first_frame": "cmx_image_job_id"
   }
 }
 ```
 
-Quoted at 5 × $0.08 = $0.40; the same take at 1080p is $1.25.
+Quoted at 5 × $0.14 = $0.70; the same take at 1080p is $1.25.
 
 ---
 

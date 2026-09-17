@@ -48,8 +48,8 @@ cost **$0.10–$4.40 per 4-, 6- or 8-second clip**, depending on model, resoluti
 audio; seven-second price entries apply to extension jobs. The other video models are
 billed per second of output at the vendor's own list rates: Gemini Omni 1.1 Flash
 **$0.03–$0.30/s** by resolution (360p to 4K, 3–10 s, extendable to 40 s), Wan 3.0
-**$0.05–$0.20/s** (480p to 1080p, 4–30 s), Grok Imagine Video 1.5 **$0.08–$0.25/s**
-(480p to 1080p, 4–15 s); a clip therefore costs **$0.10–$6.00**. Video edits on Omni
+**$0.05–$0.20/s** (480p to 1080p, 4–30 s), Grok Imagine Video 1.5 **$0.14–$0.25/s**
+(720p or 1080p, 4–15 s); a clip therefore costs **$0.10–$6.00**. Video edits on Omni
 inherit the source length or use a shorter requested trim. Gemini TTS costs **$0.01 per
 started 200 transcript characters**. The free `list_models` tool returns the current
 complete matrix before anything is generated.
@@ -79,7 +79,7 @@ expose the full profile or promo-code controls.
 | `omni-flash` (Gemini Omni 1.1 Flash) | $0.03 / $0.10 / $0.15 / $0.30 per output second at 360p / 720p / 1080p / 4K; 3–10 seconds ($0.09–$3.00) |
 | `omni-flash-1.0` | $0.10 per second at 720p, $0.12 at 1080p; 4–10 seconds ($0.40–$1.20) |
 | `wan-3.0` | $0.05 / $0.10 / $0.20 per output second at 480p / 720p / 1080p; 4–30 seconds ($0.20–$6.00) |
-| `grok-imagine-video-1.5` | $0.08 / $0.14 / $0.25 per output second at 480p / 720p / 1080p; 4–15 seconds ($0.32–$3.75) |
+| `grok-imagine-video-1.5` | $0.14 / $0.25 per output second at 720p / 1080p; 4–15 seconds ($0.56–$3.75) |
 | `gemini-3.1-flash-tts-preview` | $0.01 per started 200 transcript characters |
 
 Veo prices vary by resolution and audio. Use `list_models` for every exact
@@ -291,7 +291,7 @@ promo-code controls still require the fully authenticated profile.
 
 Images cost $0.02–$0.20 each. Veo costs $0.10–$4.40 per new 4/6/8-second clip. Omni
 Flash costs $0.03–$0.30 per output second by resolution for 3–10 seconds, Wan 3.0
-$0.05–$0.20 per second for 4–30 seconds, Grok Imagine Video 1.5 $0.08–$0.25 per second
+$0.05–$0.20 per second for 4–30 seconds, Grok Imagine Video 1.5 $0.14–$0.25 per second
 for 4–15 seconds, and speech costs $0.01 per started 200 transcript characters. Run
 the free `list_models` tool for the complete current matrix. `generate_image` defaults
 to the $0.03 `nano-banana-2-lite` model at 1024; choose `nano-banana-2` explicitly for

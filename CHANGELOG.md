@@ -18,9 +18,10 @@ and the server follows [Semantic Versioning](https://semver.org/).
 - Documented the video models added since 1.0.8: Alibaba **Wan 3.0** (4–30 s, 480p to
   1080p at $0.05 / $0.10 / $0.20 per second, free optional audio, first and last frame,
   seed, and up to 5 reference videos billed together with the output) and xAI **Grok
-  Imagine Video 1.5** (any whole 4–15 s, 480p / 720p / 1080p at xAI's own list price of
-  $0.08 / $0.14 / $0.25 per second, native sound, five aspect ratios, an exact first
-  frame plus up to 7 references — one image in total at 1080p; input images free).
+  Imagine Video 1.5** (any whole 4–15 s, 720p / 1080p at xAI's own list price of
+  $0.14 / $0.25 per second, native sound, five aspect ratios, an exact first frame plus
+  up to 7 references — one image in total at 1080p; input images free). xAI's 480p tier
+  was sold on launch day only and is not offered.
 - Documented **Gemini Omni 1.1 Flash** as `omni-flash`: per-second pricing by resolution
   ($0.03 at 360p, $0.10 at 720p, $0.15 at 1080p, $0.30 at 4K), a last frame, and scene
   extension through `edit_video` `mode: "extend"` (3–10 s per step, 40 s in total).

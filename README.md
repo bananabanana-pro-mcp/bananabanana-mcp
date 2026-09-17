@@ -166,7 +166,7 @@ Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/
 | `omni-flash` (Gemini Omni 1.1 Flash) | Video (360p–4K, sound, 3–10 s, extendable to 40 s) | $0.03 – $0.30 / s ($0.09 – $3.00) |
 | `omni-flash-1.0` | Video (720p/1080p, sound, 4–10 s) | $0.10 – $0.12 / s ($0.40 – $1.20) |
 | `wan-3.0` | Video (480p/720p/1080p, sound, 4 – 30 s) | $0.05 – $0.20 / s ($0.20 – $6.00) |
-| `grok-imagine-video-1.5` | Video (480p/720p/1080p, sound, 4 – 15 s) | $0.08 – $0.25 / s ($0.32 – $3.75) |
+| `grok-imagine-video-1.5` | Video (720p/1080p, sound, 4 – 15 s) | $0.14 – $0.25 / s ($0.56 – $3.75) |
 | `gemini-3.1-flash-tts-preview` | Speech (WAV) | $0.01 / started 200 transcript characters |
 
 Images cost **$0.02–$0.20** each; video costs **$0.10–$6.00** per clip. Veo is priced

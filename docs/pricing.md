@@ -107,7 +107,7 @@ is not a selectable generation duration.
 | `omni-flash` (Gemini Omni 1.1 Flash) | **$0.03** at 360p · **$0.10** at 720p · **$0.15** at 1080p · **$0.30** at 4K | any whole 3–10 s | $0.09 – $3.00 | Always includes sound. 360p is a draft tier (a third of the price, up to 60% faster); 720p is the native render; 1080p and 4K are upscaled. Accepts a first and last frame plus reference images. Scene extension via `edit_video` `mode: "extend"` appends 3–10 s to an existing clip, up to 40 s in total, billed on the full resulting length. Video-to-video edits keep the source length (see `edit_video`). |
 | `omni-flash-1.0` (previous Omni generation) | **$0.10** at 720p · **$0.12** at 1080p (upscaled) | 4, 6, 8, 10 s (1080p: 6, 8, 10) | $0.40 – $1.20 | Always includes sound. Kept as an option; no last frame, extension or video references. |
 | `wan-3.0` (Alibaba) | **$0.05** at 480p · **$0.10** at 720p · **$0.20** at 1080p | 4, 6, 8, 10, 15, 20, 30 s | $0.20 – $6.00 | Audio on by default and free to switch off. First and last frame, up to 10 reference images, seed. Reads up to 5 reference videos (15 s in total); **input seconds are billed like output seconds**, and input + output must fit in 30 s. Alibaba's own list price. |
-| `grok-imagine-video-1.5` (xAI) | **$0.08** at 480p · **$0.14** at 720p · **$0.25** at 1080p | any whole 4–15 s | $0.32 – $3.75 | Native sound always on. Five aspect ratios (16:9, 9:16, 1:1, 3:2, 2:3). A first frame reproduced exactly plus up to 7 reference images (one image in total at 1080p). Input images are free (xAI's own API adds $0.01 each). xAI's own per-second list price; 480p is the draft tier. |
+| `grok-imagine-video-1.5` (xAI) | **$0.14** at 720p · **$0.25** at 1080p | any whole 4–15 s | $0.56 – $3.75 | Native sound always on. Five aspect ratios (16:9, 9:16, 1:1, 3:2, 2:3). A first frame reproduced exactly plus up to 7 reference images (one image in total at 1080p). Input images are free (xAI's own API adds $0.01 each). xAI's own per-second list price for these tiers; xAI's 480p tier is not offered. |
 
 ## Speech
 
@@ -116,7 +116,7 @@ is not a selectable generation duration.
 | `gemini-3.1-flash-tts-preview` | **$0.01 per started 200 transcript characters** | One voice or exactly two named dialogue speakers. Returns mono 24 kHz, 16-bit WAV audio synchronously. |
 
 **Overall ranges:** images **$0.02–$0.20** each; video **$0.10–$6.00** per clip (Veo per
-clip; Omni Flash $0.03–$0.30/s, Wan 3.0 $0.05–$0.20/s, Grok Imagine Video $0.08–$0.25/s);
+clip; Omni Flash $0.03–$0.30/s, Wan 3.0 $0.05–$0.20/s, Grok Imagine Video $0.14–$0.25/s);
 speech **$0.01 per started 200 transcript characters**.
 
 ## Cost transparency
