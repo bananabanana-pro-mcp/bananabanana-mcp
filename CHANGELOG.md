@@ -6,6 +6,15 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Grok Imagine Video 1.5 now takes a first frame at 1080p as well as 720p.** The clip
+  opens on that exact frame in either tier. Reference images are the exception and still
+  need 720p: the upstream API renders reference-guided clips at that size at most, so a
+  1080p request carrying references is rejected before anything is charged rather than
+  delivered at a smaller size. A first frame and reference images are never combined —
+  earlier revisions of these docs said they were, which was wrong.
+
 ## [1.0.9] — 2026-09-17
 
 ### Added
