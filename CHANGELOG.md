@@ -6,6 +6,8 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.10] — 2026-09-22
+
 ### Changed
 
 - **Grok Imagine Video 1.5 now takes a first frame at 1080p as well as 720p.** The clip
