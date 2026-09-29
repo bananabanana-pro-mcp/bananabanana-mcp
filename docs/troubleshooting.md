@@ -107,7 +107,8 @@ Returned inside a tool result (`isError: true`) with a `next_step` you can act o
 | `INSUFFICIENT_BALANCE` | Balance too low for this generation. | Open the returned `top_up_url`, or call `top_up`, then retry. |
 | `DAILY_CAP_EXCEEDED` | This key hit its daily USD cap (UTC). | Wait for the next UTC day, use another key, or raise the cap. |
 | `RATE_LIMITED` | Too many tool calls. | Respect `Retry-After` when present and retry with backoff. |
-| `SAFETY_FILTERED` | The vendor's content filter (Google, OpenAI, Alibaba or xAI, depending on the model) rejected the prompt **or** the finished file (auto-refunded). The payload carries `upstream_reason` with the exact upstream verdict and `relaxed_filter` with the flag used. | Read `upstream_reason` first: `SAFETY_BLOCK` (rejected before generation) is what `relaxed_filter: true` is for on images; `IMAGE_SAFETY` came from the non-configurable output classifier, where the flag is not the lever — but a retry is still worth 1–2 attempts, since each run renders a different image and failures are refunded. On `omni-flash`, which has no such switch and filters video hardest, retry on `veo-3.1-fast`. `RECITATION` is unaffected by the flag — describe the subject generically instead of naming a work, character or brand. See below. |
+| `SAFETY_FILTERED` | The vendor's content filter (Google, OpenAI, Alibaba or xAI, depending on the model) rejected the request or output (auto-refunded). `get_result` includes `upstream_reason` and the `relaxed_filter` value used; for Google it includes `safety` categories, support codes and input/output stage when known. | Read those details before retrying. Google images already default to `relaxed_filter: true` when a project key is available; if it was false after a `SAFETY_BLOCK`, retry with explicit `true`. `IMAGE_SAFETY` is an output check unaffected by the flag; a plain retry can help for a borderline subject. `SAFETY_INPUT_IMAGE` means replace the input image. Celebrity support codes `15236754` / `29310472` require a different source or support review, not a flag change. On `omni-flash`, try `veo-3.1-fast`. See below. |
+| `SERVICE_UNAVAILABLE` | An explicit `relaxed_filter: true` for a Google image could not run because no project Vertex key was free. Nothing was charged. | Retry in about a minute or pass `relaxed_filter: false` to use the standard filter now. |
 | `UPSTREAM_FAILED` | Upstream overloaded, out of quota, timed out, or an expired edit source (auto-refunded). | Retry in a minute or two; for edits, generate a fresh video; try a lower resolution or another model. |
 | `ACCOUNT_BLOCKED` | Account is blocked. | Contact support@bananabanana.pro. |
 | `MAINTENANCE` | Service under maintenance. | Retry in a few minutes. |
@@ -117,22 +118,29 @@ Charges for `SAFETY_FILTERED` and `UPSTREAM_FAILED` failures are **refunded
 automatically** — the `get_result` payload shows `refunded: true` and the restored
 `balance_usd`.
 
-## Two filter stages, and what `relaxed_filter` actually does
+<a id="two-filter-stages-and-what-relaxed_filter-actually-does"></a>
 
-Google applies **two independent filters** to every generation on its models, and
-only the first one is configurable (GPT Image, Qwen, Wan and Grok run their vendors'
-own filters, which have no switch at all — a rejection there is refunded the same way):
+## Content filtering and `relaxed_filter`
+
+Google image generation has a configurable request filter plus independent checks on
+input media and generated output. `relaxed_filter` defaults to `true` for Google images
+when a project Vertex key is free; pass `false` to opt out. With no free project key,
+an explicit `true` returns `SERVICE_UNAVAILABLE` before charging, while the omitted
+default falls back to the standard filter. `get_result` reports the flag actually used.
+GPT Image, Qwen, Wan and Grok use their own filters, without this switch.
 
 | Stage | When it runs | Typical `upstream_reason` | Configurable? |
 |---|---|---|---|
-| **1. Request filter** | Before anything is rendered — screens the prompt and any input images. | `SAFETY_BLOCK` (images), prompt-level RAI rejection (Veo) | **Yes** — this is the stage `relaxed_filter: true` loosens (safety thresholds → OFF, `personGeneration` → adults allowed). |
-| **2. Output filter** | After the media exists — a classifier inspects the finished image/clip and decides whether to release it. | `IMAGE_SAFETY` (images), `rai_media_filtered_reasons` (Veo) | **No** — no API parameter disables it; it runs identically with `relaxed_filter: true`. It scores each rendered file on its own, so its verdict varies between attempts on the same prompt. |
+| **Request filter** | Before a Google image is rendered. | `SAFETY_BLOCK` | **Yes**, on Google images: `relaxed_filter: true` selects Vertex safety thresholds OFF and adult person generation. |
+| **Input media check** | Checks the supplied first frame or reference image. | `SAFETY_INPUT_IMAGE`; `safety.stage: "input"` when Google supplies support codes | **No**. Replace the input image; repeating the same file is unlikely to help. |
+| **Output filter** | Inspects the generated image or video. | `IMAGE_SAFETY`; `safety.stage: "output"` when known | **No**. It scores each rendered file independently, so a plain retry can help for borderline subjects. |
 
 Practical consequences:
 
-- `relaxed_filter` is the right retry when the request never made it to the model —
-  legitimate prompts about real-looking people, swimwear or sportswear, medical and
-  anatomical subjects, mild fictional violence, edgy artwork.
+- For Google images, inspect the `relaxed_filter` value in the failed result. If it is
+  already true, changing the flag will not help; rephrase the prompt. If it is false
+  after `SAFETY_BLOCK`, an explicit `true` may help a legitimate request when a
+  project key is available.
 - **After an `IMAGE_SAFETY` failure, retry anyway — just not because of the flag.**
   Stage 2 scores the pixels it was handed, and every attempt renders a different
   image, so borderline-but-legitimate subjects frequently pass on the second or third
@@ -141,15 +149,19 @@ Practical consequences:
   the fix.
 - **Nudging the wording helps more than the flag** at stage 2: same idea, less
   ambiguous framing (more coverage, less close-up anatomy, no specific real person).
-- **On video the flag barely matters.** Google exposes no configurable safety settings
-  for Veo at all — `relaxed_filter` can only pin `personGeneration=allow_adult`, which
-  is already the default for Veo 3.1. There the working levers are a retry, the
-  wording, and the model: `omni-flash` filters video hardest, `veo-3.1-fast` is
-  noticeably more permissive with people and real-looking scenes.
-- Content Google refuses outright — sexual content, minors, real public figures — stays
-  blocked on every attempt, with or without the flag.
-- Both stages surface as `error_code: "SAFETY_FILTERED"` and both are fully refunded —
-  `upstream_reason` is what tells them apart.
+- **On video the flag has no effect.** Veo already defaults to adult person generation
+  and exposes no configurable safety thresholds. There the working options are a
+  retry, revised wording, or another model; `omni-flash` filters video hardest and
+  `veo-3.1-fast` is often more permissive with real-looking scenes.
+- **Celebrity refusals stay blocked.** Support codes `15236754` and `29310472` may
+  mean a possible prominent-person likeness or missing project approval; they do not
+  prove the subject's identity. The flag does not disable this check. For a false
+  positive, use another source image or contact support with the `job_id`.
+- `MODEL_DECLINED` and `IMAGE_TEXT_ONLY` mean the model returned text instead of an
+  image. They surface as `UPSTREAM_FAILED`, not a proven policy refusal: make the
+  image task explicit and retry.
+- Safety refusals surface as `error_code: "SAFETY_FILTERED"` and are fully refunded;
+  read `upstream_reason` and any `safety` details to identify the check.
 
 ## Video jobs
 

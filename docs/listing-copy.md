@@ -4,9 +4,9 @@ Use this file as the source of truth when a directory does not refresh its card 
 the official MCP Registry. Prices can change; the free `list_models` tool is the live
 source for the current model catalogue and price matrix.
 
-## Short description (90 characters)
+## Short description (97 characters)
 
-Images, video & speech: Nano Banana, GPT Image, Veo, Omni, Wan, Grok, Gemini TTS. Pay as you go.
+Images, video & speech: Nano Banana, GPT Image, Veo, Omni, Wan, Grok, Gemini TTS. Crypto or card.
 
 This is identical to the `description` in `server.json`.
 

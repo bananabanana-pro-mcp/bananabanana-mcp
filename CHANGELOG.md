@@ -6,6 +6,23 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.11] — 2026-09-29
+
+### Changed
+
+- Synced the LobeHub tool catalogue to the live `tools/list` schemas. Google image
+  `relaxed_filter` now defaults to true when a project Vertex key is available;
+  video accepts the flag for compatibility but ignores it. An explicit true fails
+  without charge if no project key is free, while the omitted default falls back to
+  the standard filter.
+- Clarified that GPT Image with `reference_images` follows the first reference's
+  orientation and rejects an explicit `aspect_ratio` before charging.
+- Updated content-filter troubleshooting to cover input images, Google support-code
+  categories (including Celebrity), and text-only model responses. Corrected the
+  cheapest image price to $0.03 for `nano-banana-2-lite`.
+- Updated the Registry description to mention crypto and card funding; synchronized
+  the Cursor plugin and public manifests with version 1.0.11.
+
 ## [1.0.10] — 2026-09-22
 
 ### Changed

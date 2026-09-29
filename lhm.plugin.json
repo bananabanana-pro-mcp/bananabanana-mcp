@@ -3,7 +3,7 @@
   "authorUrl": "https://github.com/bananabanana-pro-mcp",
   "category": "media-generate",
   "cloudEndpoint": "https://bananabanana.pro/api/mcp",
-  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.02, video from $0.10, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
+  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.03, video from $0.10, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
   "homepage": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
   "icon": "https://bananabanana.pro/mcp-icon-512.png",
   "identifier": "bananabanana-pro-mcp-bananabanana-mcp",
@@ -52,7 +52,7 @@
     },
     {
       "name": "generate_image",
-      "description": "Start an AI image generation (Google Nano Banana family, OpenAI GPT Image 2.5, Alibaba Qwen-Image 3.0 Pro). Charges the account balance immediately and returns a job_id — poll get_result for the finished image URLs. Typical completion: 10–60 seconds. The default nano-banana-2-lite model is the cheapest Google option and produces 1024px images; choose nano-banana-2 explicitly for 512px, 2048px or 4096px output. Optional reference_images provide the model with the actual subject, product, character or style pixels; Nano Banana Pro supports up to 14 references (per-model limits in list_models). Costs $0.03–$0.20 per image depending on model and resolution (see list_models). Failed generations are automatically refunded. If a legitimate prompt is rejected by Google's content filter, retry with relaxed_filter: true. Generating several images at once (number_of_images > 1) is a batch: the first call returns a price quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to start. Example: {\"prompt\": \"studio photo of a ceramic mug on linen, soft daylight\", \"model\": \"nano-banana-2-lite\", \"aspect_ratio\": \"4:5\", \"resolution\": \"1024\"}",
+      "description": "Start an AI image generation (Google Nano Banana family, OpenAI GPT Image 2.5, Alibaba Qwen-Image 3.0 Pro). Charges the account balance immediately and returns a job_id — poll get_result for the finished image URLs. Typical completion: 10–60 seconds. The default nano-banana-2-lite model is the cheapest Google option and produces 1024px images; choose nano-banana-2 explicitly for 512px, 2048px or 4096px output. Optional reference_images provide the model with the actual subject, product, character or style pixels; Nano Banana Pro supports up to 14 references (per-model limits in list_models). Costs $0.03–$0.20 per image depending on model and resolution (see list_models). Failed generations are automatically refunded. relaxed_filter is true by default for Google images; pass false to opt out. Non-configurable checks still apply. Generating several images at once (number_of_images > 1) is a batch: the first call returns a price quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to start. Example: {\"prompt\": \"studio photo of a ceramic mug on linen, soft daylight\", \"model\": \"nano-banana-2-lite\", \"aspect_ratio\": \"4:5\", \"resolution\": \"1024\"}",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -72,7 +72,7 @@
               "qwen-image-3.0-pro"
             ],
             "default": "nano-banana-2-lite",
-            "description": "nano-banana-2-lite: cheapest Google default, 1024 only. nano-banana-2: choose for 512, 2048 or 4096 output. nano-banana-pro: top Google quality, up to 4K. gpt-image-2.5-flare / gpt-image-2.5-sunburst: OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096 (4K = 3840 on the long side); Flare is the fast 2.5 tier, Sunburst the precision tier; they ignore seed and relaxed_filter. qwen-image-3.0-pro: Alibaba — crisp small text, dense layouts (posters, menus, UI); 1024 or 2048 only, up to 3 references, seed + negative_prompt. Cheapest per image: nano-banana-2-lite at $0.03."
+            "description": "nano-banana-2-lite: cheapest Google default, 1024 only. nano-banana-2: choose for 512, 2048 or 4096 output. nano-banana-pro: top Google quality, up to 4K. gpt-image-2.5-flare / gpt-image-2.5-sunburst: OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096 (4K = 3840 on the long side); Flare is the fast 2.5 tier, Sunburst the precision tier; they ignore seed and relaxed_filter, and with reference_images they take the orientation of the first reference (omit aspect_ratio there, it is rejected). qwen-image-3.0-pro: Alibaba — crisp small text, dense layouts (posters, menus, UI); 1024 or 2048 only, up to 3 references, seed + negative_prompt. Cheapest per image: nano-banana-2-lite at $0.03."
           },
           "aspect_ratio": {
             "type": "string",
@@ -133,12 +133,12 @@
               "type": "string"
             },
             "maxItems": 14,
-            "description": "Actual visual references for the generated image. Each item is a job_id of a completed image generation on this account, a public http(s) image URL, or an inline data:image/png|jpeg|webp;base64,... URL (max 10 MB each). For a local file, read and base64-encode its bytes into a data URL; a bare local path such as C:\\\\photo.jpg cannot be read by this remote server."
+            "description": "Actual visual references for the generated image. Each item is a job_id of a completed image generation on this account, a public http(s) image URL, or an inline data:image/png|jpeg|webp;base64,... URL (max 10 MB each). For a local file, read and base64-encode its bytes into a data URL; a bare local path such as C:\\\\photo.jpg cannot be read by this remote server. Google and Qwen models keep aspect_ratio with references; GPT Image models follow the first reference's orientation instead and reject an explicit aspect_ratio."
           },
           "relaxed_filter": {
             "type": "boolean",
-            "default": false,
-            "description": "Switch this call to Google's own permissive presets: safety thresholds OFF and person generation allowed for adults (safetySettings and personGeneration=ALLOW_ADULT — documented Vertex AI parameters, not a way around Google's rules). Google filters in two independent stages and this flag only affects the first: (1) a check on the request before anything is rendered — this is what refuses legitimate prompts about real-looking people, swimwear or sportswear, medical and anatomical subjects, mild fictional violence and edgy artwork (upstream_reason SAFETY_BLOCK), and it is the stage relaxed_filter relaxes; (2) a classifier that scores the finished image, which no parameter can switch off (upstream_reason IMAGE_SAFETY). Stage 2 judges the actual pixels and every run renders a different image, so a borderline but legitimate subject rejected there often passes on a plain retry or with slightly less ambiguous wording — retrying is reasonable (failures are fully refunded, so an attempt costs only time), just don't expect the flag itself to bypass that stage. What Google refuses outright — sexual content, minors, real public figures — stays blocked in every attempt. A third, separate verdict is upstream_reason SAFETY_INPUT_IMAGE: Google refused the image you supplied as input (first frame or reference). That one is deterministic — the same file always scores the same, so no flag and no retry helps; send a different image. All of them surface as error_code SAFETY_FILTERED; upstream_reason in get_result tells them apart."
+            "default": true,
+            "description": "Enabled by default for Google images. Uses safetySettings thresholds OFF (no configurable threshold blocking) and personGeneration=ALLOW_ADULT. Pass false to use BLOCK_ONLY_HIGH and omit personGeneration. Runs only on our own Google keys: when none is free, an explicit true is refused with SERVICE_UNAVAILABLE before any charge, and the default silently falls back to the standard filter (get_result then reports relaxed_filter: false). Ignored by other image providers and by every video model. OFF and BLOCK_NONE are image/Gemini safety options, not video parameters. Non-configurable checks still apply, including checks on generated images and input media. Celebrity refusals (support codes 15236754 / 29310472) are not disabled by this flag. get_result explains the category and stage when Google supplies support codes; failed jobs are refunded."
           },
           "confirm_cost": {
             "type": "number",
@@ -222,8 +222,8 @@
           },
           "relaxed_filter": {
             "type": "boolean",
-            "default": false,
-            "description": "Switch this call to Google's own permissive presets: safety thresholds OFF and person generation allowed for adults (safetySettings and personGeneration=ALLOW_ADULT — documented Vertex AI parameters, not a way around Google's rules). Google filters in two independent stages and this flag only affects the first: (1) a check on the request before anything is rendered — this is what refuses legitimate prompts about real-looking people, swimwear or sportswear, medical and anatomical subjects, mild fictional violence and edgy artwork (upstream_reason SAFETY_BLOCK), and it is the stage relaxed_filter relaxes; (2) a classifier that scores the finished image, which no parameter can switch off (upstream_reason IMAGE_SAFETY). Stage 2 judges the actual pixels and every run renders a different image, so a borderline but legitimate subject rejected there often passes on a plain retry or with slightly less ambiguous wording — retrying is reasonable (failures are fully refunded, so an attempt costs only time), just don't expect the flag itself to bypass that stage. What Google refuses outright — sexual content, minors, real public figures — stays blocked in every attempt. A third, separate verdict is upstream_reason SAFETY_INPUT_IMAGE: Google refused the image you supplied as input (first frame or reference). That one is deterministic — the same file always scores the same, so no flag and no retry helps; send a different image. All of them surface as error_code SAFETY_FILTERED; upstream_reason in get_result tells them apart."
+            "default": true,
+            "description": "Enabled by default for Google images. Uses safetySettings thresholds OFF (no configurable threshold blocking) and personGeneration=ALLOW_ADULT. Pass false to use BLOCK_ONLY_HIGH and omit personGeneration. Runs only on our own Google keys: when none is free, an explicit true is refused with SERVICE_UNAVAILABLE before any charge, and the default silently falls back to the standard filter (get_result then reports relaxed_filter: false). Ignored by other image providers and by every video model. OFF and BLOCK_NONE are image/Gemini safety options, not video parameters. Non-configurable checks still apply, including checks on generated images and input media. Celebrity refusals (support codes 15236754 / 29310472) are not disabled by this flag. get_result explains the category and stage when Google supplies support codes; failed jobs are refunded."
           },
           "idempotency_key": {
             "type": "string",
@@ -358,8 +358,7 @@
           },
           "relaxed_filter": {
             "type": "boolean",
-            "default": false,
-            "description": "Veo only (omni-flash ignores it), and much weaker than its image counterpart: Google's video API exposes no configurable safety settings at all, so this flag can do only one thing — pin personGeneration=allow_adult, which is already the default for Veo 3.1 here. Expect it to change little. Video is filtered both before generation and again on the finished clip (rai_media_filtered_reasons), and neither check can be turned off. When a clip is refused, the levers that actually work are: retry (each run renders different footage, and failures are fully refunded), reword the people-related part of the prompt, or move an omni-flash idea to veo-3.1-fast, whose filter is noticeably looser."
+            "description": "Accepted for compatibility and has no effect on video: Google's video API exposes no configurable safety settings, personGeneration=allow_adult is already the default for Veo 3.1, and Omni and gateway models have no such switch at all. Video is filtered both before generation and again on the finished clip (rai_media_filtered_reasons), and neither check can be turned off. When a clip is refused, the levers that actually work are: retry (each run renders different footage, and failures are fully refunded), reword the people-related part of the prompt, or move an omni-flash idea to veo-3.1-fast, whose filter is noticeably looser."
           },
           "confirm_cost": {
             "type": "number",
@@ -661,5 +660,5 @@
       }
     }
   ],
-  "version": "1.0.10"
+  "version": "1.0.11"
 }
