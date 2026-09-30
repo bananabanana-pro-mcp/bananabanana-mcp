@@ -29,9 +29,9 @@ OAuth-capable client uses that pointer to start the sign-in flow. Causes:
   connect again.
 - **Account blocked.** Contact support@bananabanana.pro.
 
-Note that `initialize`, `ping` and `tools/list` answer *without* credentials, so a
-successful `tools/list` does not prove your credential works — test with a tool call
-such as `list_models` (free).
+`initialize` requires authentication. Direct `ping` and `tools/list` calls can
+answer without credentials, so a successful `tools/list` does not prove your
+credential works — test with `initialize` or a free `list_models` tool call.
 
 Verify quickly:
 
