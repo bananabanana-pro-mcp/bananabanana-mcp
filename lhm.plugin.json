@@ -3,7 +3,7 @@
   "authorUrl": "https://github.com/bananabanana-pro-mcp",
   "category": "media-generate",
   "cloudEndpoint": "https://bananabanana.pro/api/mcp",
-  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.03, video from $0.10, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
+  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.03, video from $0.09, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
   "homepage": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
   "icon": "https://bananabanana.pro/mcp-icon-512.png",
   "identifier": "bananabanana-pro-mcp-bananabanana-mcp",
@@ -660,5 +660,5 @@
       }
     }
   ],
-  "version": "1.0.11"
+  "version": "1.0.12"
 }

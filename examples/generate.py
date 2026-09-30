@@ -33,7 +33,11 @@ def call(tool: str, **args):
     body = r.json()
     if "error" in body:
         raise RuntimeError(f"{body['error'].get('message')} ({body['error'].get('code')})")
-    return body["result"]["structuredContent"]
+    result = body["result"]
+    if result.get("isError"):
+        error = result["structuredContent"]
+        raise RuntimeError(f"{error['error_code']}: {error['message']} {error.get('next_step', '')}")
+    return result["structuredContent"]
 
 
 def main() -> None:

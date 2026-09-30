@@ -6,7 +6,7 @@ to it. No subscription, no monthly fee, no saved card, no auto-renewal. Top up w
 <https://bananabanana.pro/profile>, or ask the agent for a link with the free `top_up`
 tool.
 
-> These tables are current at the time of writing. Prices are always available live
+> These tables were audited against the deployed model catalogue on 2026-09-30. Prices are always available live
 > from the [`list_models`](./tools.md#list_models--free) tool — treat that as the
 > source of truth and let your agent read it before quoting a cost.
 
@@ -115,7 +115,10 @@ is not a selectable generation duration.
 |---|---|---|
 | `gemini-3.1-flash-tts-preview` | **$0.01 per started 200 transcript characters** | One voice or exactly two named dialogue speakers. Returns mono 24 kHz, 16-bit WAV audio synchronously. |
 
-**Overall ranges:** images **$0.03–$0.20** each; video **$0.10–$6.00** per clip (Veo per
+The cheapest new video is a 3-second `omni-flash` clip at 360p: **$0.09**, with
+sound. The cheapest Veo clip remains $0.10 (4 seconds, silent, 720p).
+
+**Overall ranges:** images **$0.03–$0.20** each; video **$0.09–$6.00** per clip (Veo per
 clip; Omni Flash $0.03–$0.30/s, Wan 3.0 $0.05–$0.20/s, Grok Imagine Video $0.14–$0.25/s);
 speech **$0.01 per started 200 transcript characters**.
 

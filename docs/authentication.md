@@ -24,8 +24,8 @@ metadata (RFC 9728) and resource indicators (RFC 8707).
 In an OAuth-capable client the flow is:
 
 1. Add a custom connector with the URL `https://bananabanana.pro/api/mcp`.
-2. The first protected tool call receives HTTP `401` with a `WWW-Authenticate`
-   pointer to the protected-resource metadata.
+2. An unauthenticated `initialize` handshake or protected tool call receives
+   HTTP `401` with a `WWW-Authenticate` pointer to the protected-resource metadata.
 3. The client discovers the authorization server and its endpoints. Clients using
    dynamic registration register themselves at `/api/oauth/register`.
 4. The client creates an S256 PKCE challenge and opens the BananaBanana authorization
@@ -44,13 +44,16 @@ time — that invalidates their tokens immediately.
 
 | Document | URL |
 |----------|-----|
-| Protected resource metadata at the domain root (RFC 9728) | `https://bananabanana.pro/.well-known/oauth-protected-resource` |
 | Protected resource metadata (RFC 9728) | `https://bananabanana.pro/.well-known/oauth-protected-resource/api/mcp` |
 | Authorization server metadata (RFC 8414) | `https://bananabanana.pro/.well-known/oauth-authorization-server` |
 | Dynamic client registration (RFC 7591) | `POST https://bananabanana.pro/api/oauth/register` |
 | Authorization endpoint | `https://bananabanana.pro/oauth/authorize` |
 | Token endpoint | `POST https://bananabanana.pro/api/oauth/token` |
 | Revocation endpoint (RFC 7009) | `POST https://bananabanana.pro/api/oauth/revoke` |
+
+The bare `/.well-known/oauth-protected-resource` URL intentionally returns **404**
+with `resource` and `resource_metadata` pointers to the canonical MCP resource. Use
+the path-aware document above; the domain root is not an MCP endpoint.
 
 Details that matter when you implement a client:
 
@@ -71,8 +74,11 @@ HTTP/1.1 401 Unauthorized
 WWW-Authenticate: Bearer realm="bananabanana", resource_metadata="https://bananabanana.pro/.well-known/oauth-protected-resource/api/mcp", scope="mcp"
 ```
 
-`initialize`, `ping` and `tools/list` answer without credentials, so a client can
-inspect the tool catalogue before signing in (lazy authentication).
+`initialize` requires authentication and returns the OAuth challenge above when
+called without a token. `ping`, `tools/list`, `prompts/list` and `resources/list`
+remain public; `notifications/initialized` is accepted with HTTP 202 and no body.
+A client can inspect `tools/list` directly before signing in. Authenticated
+`initialize` advertises the documentation version from the public MCP manifest.
 
 The Registry descriptor intentionally declares only the remote URL — it does not
 declare a manual `Authorization` header. OAuth discovery happens at runtime through

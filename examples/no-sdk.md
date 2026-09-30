@@ -16,13 +16,15 @@ Accept: application/json, text/event-stream
 ```
 
 Responses are a single JSON body; the useful payload is
-`result.structuredContent`. No session handshake is required — `initialize` is
-optional, and each call is independent.
+`result.structuredContent`. Check HTTP status, the top-level JSON-RPC `error`, and
+`result.isError` before using it. Tool errors are returned at HTTP 200; their
+structured payload contains `error_code`, `message` and `next_step`. No session
+handshake is required — `initialize` is optional, and each call is independent.
 
 ## curl
 
 ```bash
-# start an image generation (charges one image, $0.06 on the default model)
+# start an image generation (charges one image, $0.03 on the default nano-banana-2-lite model)
 curl -s https://bananabanana.pro/api/mcp \
   -H "Authorization: Bearer bb_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
@@ -57,7 +59,13 @@ def call(tool, **args):
         "params": {"name": tool, "arguments": args},
     })
     r.raise_for_status()
-    return r.json()["result"]["structuredContent"]
+    body = r.json()
+    if "error" in body:
+        raise RuntimeError(body["error"]["message"])
+    result = body["result"]
+    if result.get("isError"):
+        raise RuntimeError(result["structuredContent"]["message"])
+    return result["structuredContent"]
 
 job = call("generate_image", prompt="watercolor painting of a lighthouse at dawn")
 
@@ -65,6 +73,8 @@ result = call("get_result", job_id=job["job_id"], wait_seconds=30)
 while result["status"] == "processing":
     result = call("get_result", job_id=job["job_id"], wait_seconds=30)
 
+if result["status"] != "completed":
+    raise RuntimeError(f"Unexpected job status: {result['status']}")
 print(result["files"][0]["url"], "cost:", result["cost_charged_usd"])
 ```
 
@@ -87,8 +97,10 @@ async function call(tool: string, args: Record<string, unknown>) {
       params: { name: tool, arguments: args },
     }),
   });
-  const { result } = await res.json();
-  return result.structuredContent;
+  const body = await res.json();
+  if (!res.ok || body.error) throw new Error(body.error?.message ?? `HTTP ${res.status}`);
+  if (body.result.isError) throw new Error(body.result.structuredContent.message);
+  return body.result.structuredContent;
 }
 
 const job = await call("generate_image", {
@@ -99,6 +111,7 @@ let out = await call("get_result", { job_id: job.job_id, wait_seconds: 30 });
 while (out.status === "processing") {
   out = await call("get_result", { job_id: job.job_id, wait_seconds: 30 });
 }
+if (out.status !== "completed") throw new Error(`Unexpected job status: ${out.status}`);
 console.log(out.files[0].url, "cost:", out.cost_charged_usd);
 ```
 
@@ -114,8 +127,9 @@ console.log(out.files[0].url, "cost:", out.cost_charged_usd);
   [`../docs/tools.md`](../docs/tools.md).
 - **Idempotency.** Pass an `idempotency_key` argument to any `generate_*` call to
   make retries safe — a repeated key never charges twice.
-- **Errors.** JSON-RPC errors carry a machine-readable code (`INSUFFICIENT_BALANCE`,
+- **Errors.** Tool errors set `result.isError` and carry a machine-readable code (`INSUFFICIENT_BALANCE`,
   `SAFETY_FILTERED`, `RATE_LIMITED`, …) — see
   [`../docs/troubleshooting.md`](../docs/troubleshooting.md).
 - **Limits.** Respect HTTP `429`, tool error `RATE_LIMITED` and `Retry-After` when
-  present. Media URLs are signed and valid for 24 h — download what you want to keep.
+  present. Media URLs are signed and valid for 24 h; files are retained for 30 days
+  from creation — download what you want to keep.

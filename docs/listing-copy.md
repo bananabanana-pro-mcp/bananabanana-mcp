@@ -49,7 +49,7 @@ audio; seven-second price entries apply to extension jobs. The other video model
 billed per second of output at the vendor's own list rates: Gemini Omni 1.1 Flash
 **$0.03–$0.30/s** by resolution (360p to 4K, 3–10 s, extendable to 40 s), Wan 3.0
 **$0.05–$0.20/s** (480p to 1080p, 4–30 s), Grok Imagine Video 1.5 **$0.14–$0.25/s**
-(720p or 1080p, 4–15 s); a clip therefore costs **$0.10–$6.00**. Video edits on Omni
+(720p or 1080p, 4–15 s); a new clip therefore costs **$0.09–$6.00**. Video edits on Omni
 inherit the source length or use a shorter requested trim. Gemini TTS costs **$0.01 per
 started 200 transcript characters**. The free `list_models` tool returns the current
 complete matrix before anything is generated.
@@ -329,6 +329,13 @@ Use `https://bananabanana.pro/api/mcp`. The shorter
 
 Each credential is limited to 20 tool calls per minute. A paid call can also be blocked
 by insufficient balance or an optional daily spend cap.
+
+## Release and catalogue versions
+
+The current documentation release and official Registry version are **1.0.12**
+(2026-09-30). GitHub’s Latest release must be updated when a new version is
+published; pushing `main` or publishing the MCP Registry does not update it.
+Generated media is retained for 30 days from creation, with 24-hour signed URLs.
 
 ## Manual marketplace checklist
 

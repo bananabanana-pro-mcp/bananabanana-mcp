@@ -22,8 +22,13 @@ async function call(tool, args) {
     }),
   });
   const body = await res.json();
-  if (body.error) throw new Error(`${body.error.message} (${body.error.code})`);
-  return body.result.structuredContent;
+  if (!res.ok || body.error) throw new Error(body.error?.message ?? `HTTP ${res.status}`);
+  const result = body.result;
+  if (result.isError) {
+    const error = result.structuredContent;
+    throw new Error(`${error.error_code}: ${error.message} ${error.next_step ?? ""}`);
+  }
+  return result.structuredContent;
 }
 
 if (!API_KEY) {

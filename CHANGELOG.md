@@ -6,6 +6,31 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.12] — 2026-09-30
+
+### Fixed
+
+- Corrected OAuth discovery: unauthenticated `initialize` requires a 401 challenge;
+  direct `tools/list` remains public. The root protected-resource metadata URL is
+  intentionally 404; use the path-aware `/api/mcp` metadata document.
+- Corrected the overall video minimum to $0.09 (3-second Omni 1.1 at 360p with sound).
+  Veo still starts at $0.10. Corrected the no-SDK default image price to $0.03.
+- Documented 30-day media retention, 24-hour links, seven-day image edit context,
+  and speech download limitations instead of implying permanent file storage.
+- Corrected account/model examples: `list_models` does not return a top-up link;
+  `get_account` includes one only when the balance cannot cover the cheapest image.
+- Documented Qwen's additional estimated 4,500-token prompt limit, the TTS wrapper
+  in the UTF-8 budget, and rejection of image references outside Omni scene extension.
+- Made the runnable Python/JavaScript examples stop on tool errors at HTTP 200.
+- Aligned the deployed MCP handshake version with the public manifest and updated
+  its model instructions and synchronous speech behavior.
+
+### Added
+
+- Added the separate x402 pay-per-call reference: USDC on Base, exact-price 402
+  challenge, supported tools, input restrictions, polling and refund credit tokens.
+- Added a visible documentation version and release link to the README.
+
 ## [1.0.11] — 2026-09-29
 
 ### Changed

@@ -185,8 +185,11 @@ Videos are the slowest and most failure-prone path — plan for polling.
 
 ## Results & media URLs
 
-- **Media URLs are signed and valid for 24 hours.** They expire, the media does not —
-  call `get_result` again with the same `job_id` for fresh links anytime.
+- **Media URLs are signed and valid for 24 hours.** Generated files are retained
+  for 30 days from creation. Within that period, call `get_result` again with the
+  same image/video `job_id` for fresh links. After cleanup, it returns `NOT_FOUND`.
+  Speech is absent from `get_result` and account history; download its WAV directly
+  from the synchronous response before that link expires.
 - **Lost a `job_id`?** Use `list_generations` to find recent jobs (shared with your
   website history), then `get_result`.
 

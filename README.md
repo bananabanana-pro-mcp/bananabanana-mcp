@@ -8,10 +8,12 @@ An MCP server for **image, video, and speech generation** — Google **Nano Bana
 - **Auth:** OAuth 2.1 (sign in — nothing to copy) or `Authorization: Bearer bb_live_…` — [create a key](https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog)
 - **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog> · **Docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
 
-Generate images from $0.03, videos from $0.10, and speech for $0.01 per started 200
+Generate images from $0.03, videos from $0.09, and speech for $0.01 per started 200
 transcript characters, billed from an account balance you top up with crypto (from $1)
 or by card, PayPal or SEPA (from $20). Cost quotes before every expensive call,
 automatic refunds on failure, and one shared image/video history with the website.
+
+**Current documentation release: [v1.0.12](https://github.com/bananabanana-pro-mcp/bananabanana-mcp/releases/tag/v1.0.12)** — audited against the deployed tool schemas and model catalogue on 2026-09-30. See the [changelog](./CHANGELOG.md).
 
 ## Quick Start
 
@@ -147,6 +149,11 @@ Image and video generation is async: generation/editing calls return a `job_id`;
 directly. `generate_video`, `edit_video` and multi-image `generate_image` **quote first
 and charge nothing** until you repeat the call with `confirm_cost`.
 
+Generated files are retained for **30 days from creation**; signed download links
+last 24 hours. Within the retention period, `get_result` can issue fresh image/video
+links. Download speech from its synchronous response; it is absent from
+`list_generations`.
+
 ## Pricing
 
 Pay-as-you-go in USD: per image, per Veo clip, per second of output for Omni Flash,
@@ -169,7 +176,7 @@ Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/
 | `grok-imagine-video-1.5` | Video (720p/1080p, sound, 4 – 15 s) | $0.14 – $0.25 / s ($0.56 – $3.75) |
 | `gemini-3.1-flash-tts-preview` | Speech (WAV) | $0.01 / started 200 transcript characters |
 
-Images cost **$0.03–$0.20** each; video costs **$0.10–$6.00** per clip. Veo is priced
+Images cost **$0.03–$0.20** each; video costs **$0.09–$6.00** per clip. Veo is priced
 per clip, while Omni Flash, Wan 3.0 and Grok Imagine Video are billed per second of
 output at the vendor's own list rates. Veo generation accepts 4, 6 or 8 seconds; the
 7-second prices returned by `list_models` are for extension jobs, not a selectable
@@ -201,6 +208,14 @@ deposit-only session.
   $100+ receive 5% / 10% extra balance, and an active partner promo code adds another
   10%. One balance and one image/video history are shared between MCP and the website.
 
+## Pay per call without an account (x402)
+
+A separate HTTP endpoint, `https://bananabanana.pro/api/x402`, accepts USDC on Base
+without an account, OAuth or an API key. It supports image, video and speech
+generation. Image/speech payments settle after success; video is prepaid and failure
+returns a single-use refund credit token. See [docs/x402.md](./docs/x402.md) for the
+request format, exact-price challenge, polling and input restrictions.
+
 ## Registry
 
 Published in the official [MCP Registry](https://github.com/modelcontextprotocol/registry)
@@ -216,6 +231,7 @@ curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=pro.bananaba
 - **Website:** <https://bananabanana.pro/?utm_source=mcp_readme&utm_medium=mcp_catalog>
 - **MCP docs & live example:** <https://bananabanana.pro/mcp?utm_source=mcp_readme&utm_medium=mcp_catalog>
 - **Create an API key:** <https://bananabanana.pro/profile?utm_source=mcp_readme&utm_medium=mcp_catalog>
+- **x402 pay per call** · [`docs/x402.md`](./docs/x402.md)
 - **Authentication** · [`docs/authentication.md`](./docs/authentication.md)
 - **Tools reference** · [`docs/tools.md`](./docs/tools.md)
 - **Pricing & limits** · [`docs/pricing.md`](./docs/pricing.md)

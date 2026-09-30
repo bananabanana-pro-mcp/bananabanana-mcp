@@ -27,8 +27,11 @@ for the live numbers rather than hard-coding them.
 - **`confirm_cost`** — the quoted USD number you accept. Omit to get a quote first.
 - **`idempotency_key`** — optional unique string (≤64 chars). Retries with the same key
   never double-charge; a repeat returns the original job.
-- **Media URLs** — signed and valid for **24 hours**. The media itself is kept — call
-  `get_result` again for fresh links.
+- **Media URLs** — signed and valid for **24 hours**. Generated image, video and
+  speech files are retained for **30 days from creation**. Call `get_result` for
+  fresh image/video links within that period; download files you want to keep.
+  Image conversation context is retained for 7 days. Speech is not polled with
+  `get_result`: download the WAV from its synchronous response.
 - **Refunds** — failed and content-filtered generations are refunded automatically.
 - **Secure OAuth top-up** — `top_up` returns a one-time, 30-minute browser link for an
   OAuth connection. It opens a deposit-only session with a two-hour sliding idle
@@ -72,10 +75,11 @@ durations and constraints. Call this before quoting a cost or choosing a model.
   "speech_models": [
     { "id": "gemini-3.1-flash-tts-preview", "type": "speech", "price_usd_per_started_200_characters": 0.01 }
   ],
-  "top_up_url": "https://bananabanana.pro/profile",
   "docs_url": "https://bananabanana.pro/mcp"
 }
 ```
+
+The model catalogue does not issue a `top_up_url`; use `top_up` for a funding link.
 
 ---
 
@@ -92,10 +96,12 @@ how much of it is used today (UTC).
 {
   "balance_usd": 12.40,
   "api_key": { "name": "claude-desktop", "daily_cap_usd": 5, "spent_today_usd": 0.62 },
-  "top_up_url": "https://bananabanana.pro/profile",
   "docs_url": "https://bananabanana.pro/mcp"
 }
 ```
+
+When the balance is below the cheapest image price, this response also includes a
+secure `top_up_url` (or a retry delay). Otherwise call `top_up` explicitly.
 
 ---
 
@@ -145,7 +151,7 @@ Start a text-to-image generation with the Google Nano Banana family, OpenAI GPT 
 
 | Parameter | Type | Default | Notes |
 |---|---|---|---|
-| `prompt` | string, ≤32000 | — | **Required.** English works best. `list_models` reports `max_prompt_chars` per model (Qwen: 20000). |
+| `prompt` | string, ≤32000 | — | **Required.** English works best. `list_models` reports `max_prompt_chars` per model (Qwen: 20000 characters and an estimated 4500-token limit, whichever is reached first). |
 | `model` | enum | `nano-banana-2-lite` | `nano-banana-2-lite` (cheapest Google default, 1024 only) · `nano-banana-2` (choose for 512, 2048 or 4096) · `nano-banana-pro` (top Google quality, up to 4K, no 512) · `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` (OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096; Flare is the fast tier, Sunburst the precision tier; they ignore `seed` and `relaxed_filter`; with references, omit `aspect_ratio` because output follows the first reference's orientation) · `qwen-image-3.0-pro` (Alibaba — crisp small text and dense layouts; 1024 or 2048 only, up to 3 references, `seed` and `negative_prompt`). Cheapest per image: `nano-banana-2-lite` at $0.03. |
 | `aspect_ratio` | enum | `1:1` | `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`. |
 | `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096`. 512 only on `nano-banana-2`; lite is 1024 only; `nano-banana-pro` and GPT Image have no 512; Qwen accepts 1024 or 2048. GPT Image renders 4096 at 3840 on the long side (8.3 MP cap). |
@@ -234,7 +240,7 @@ Response is the same shape as `generate_image` (a new `job_id` you poll with
 
 ---
 
-## `generate_video`  — paid ($0.10–$6.00 per clip). Cost confirmation always required.
+## `generate_video`  — paid ($0.09–$6.00 per clip). Cost confirmation always required.
 
 Start a video generation with the Google Veo 3.1 family, Gemini Omni Flash (1.1 or
 1.0), Alibaba Wan 3.0 or xAI Grok Imagine Video 1.5. The **first call always returns a
@@ -392,7 +398,7 @@ and audio are yours to choose.
 | `resolution` | enum | `720p` | `wan-3.0` only: `480p`, `720p`, `1080p`. Omni edits are always 720p. |
 | `with_audio` | boolean | `true` | `wan-3.0` only: sound is on by default and free — pass `false` for a silent clip. Omni always generates audio. |
 | `audio_prompt` | string, ≤500 | — | Describe the desired sound — Omni Flash always generates audio. |
-| `reference_images` | string[], ≤10 | — | Omni `extend` only: subjects, products or characters the continuation should bring into the scene (job_id, public URL or base64 data URL). Refer to them in the prompt. Ignored by `edit` and by Wan. |
+| `reference_images` | string[], ≤10 | — | Omni `extend` only: subjects, products or characters the continuation should bring into the scene (job_id, public URL or base64 data URL). Refer to them in the prompt. Supplying nonempty references in `edit` mode, on `omni-flash-1.0` or on Wan returns `INVALID_PARAMS` before charging. |
 | `confirm_cost` | number | — | The quoted USD you accept. Omit on the first call to get the quote. |
 | `idempotency_key` | string, ≤64 | — | Safe-retry key. |
 
@@ -474,7 +480,7 @@ Available voices:
 `Vindemiatrix`, `Zephyr`, `Zubenelgenubi`.
 
 The generated file is mono, 24 kHz, 16-bit WAV. `style` and `text` together must fit
-within 8,000 UTF-8 bytes; split longer scripts to keep voice quality stable. Inline
+within 8,000 UTF-8 bytes including the server’s direction and transcript wrapper; split longer scripts to keep voice quality stable. Inline
 performance tags include `[whispers]`, `[laughs]`, `[sighs]`, `[shouting]`,
 `[very fast]` and `[very slow]`.
 
@@ -531,7 +537,7 @@ images.
   "files": [
     { "url": "https://bananabanana.pro/api/files/...?sig=...", "thumbnail_url": "https://bananabanana.pro/api/files/...?thumb=1&sig=..." }
   ],
-  "files_note": "URLs are valid for 24 hours. The media itself is kept — call get_result again for fresh links.",
+  "files_note": "URLs are valid for 24 hours. Generated media is retained for 30 days from creation; call get_result again for fresh links within that period. Download files you want to keep.",
   "cost_charged_usd": 0.06,
   "balance_remaining_usd": 12.34
 }
