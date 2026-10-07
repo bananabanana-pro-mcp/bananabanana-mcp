@@ -6,6 +6,16 @@ and the server follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.13] — 2026-10-07
+
+### Added
+
+- `nano-banana-2-1` (Google Nano Banana 2.1) in `generate_image` and `edit_image`:
+  1024 / 2048 / 4096 for $0.03 / $0.05 / $0.10, no 512. It is the only model with the
+  panoramic aspect ratios `1:4`, `4:1`, `1:8`, `8:1` and `9:21`; other models reject them
+  before any charge. It does not accept `seed` (the call is rejected before charging).
+  `list_models` now reports `aspect_ratios` and `supports.seed` per model.
+
 ## [1.0.12] — 2026-09-30
 
 ### Fixed

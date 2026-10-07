@@ -60,6 +60,7 @@ durations and constraints. Call this before quoting a cost or choosing a model.
   "image_models": [
     { "id": "nano-banana-2-lite", "type": "image", "vendor": "google", "prices_per_image_usd": { "1024": 0.03 }, "resolutions": ["1024"], "max_reference_images": 14, "supports": { "seed": true, "negative_prompt": true, "relaxed_filter": true, "edit_image": true } },
     { "id": "nano-banana-2", "type": "image", "vendor": "google", "prices_per_image_usd": { "512": 0.03, "1024": 0.06, "2048": 0.09, "4096": 0.13 } },
+    { "id": "nano-banana-2-1", "type": "image", "vendor": "google", "prices_per_image_usd": { "1024": 0.03, "2048": 0.05, "4096": 0.10 }, "aspect_ratios": ["1:1", "3:2", "2:3", "4:3", "3:4", "4:5", "5:4", "9:16", "16:9", "21:9", "1:4", "4:1", "1:8", "8:1", "9:21"], "supports": { "seed": false, "negative_prompt": true, "relaxed_filter": true, "edit_image": true } },
     { "id": "nano-banana-pro", "type": "image", "vendor": "google", "prices_per_image_usd": { "1024": 0.11, "2048": 0.11, "4096": 0.20 } },
     { "id": "gpt-image-2.5-flare", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.05, "2048": 0.11, "4096": 0.18 }, "supports": { "seed": false, "negative_prompt": false, "relaxed_filter": false, "edit_image": false } },
     { "id": "gpt-image-2.5-sunburst", "type": "image", "vendor": "openai", "prices_per_image_usd": { "1024": 0.05, "2048": 0.11, "4096": 0.18 } },
@@ -152,13 +153,13 @@ Start a text-to-image generation with the Google Nano Banana family, OpenAI GPT 
 | Parameter | Type | Default | Notes |
 |---|---|---|---|
 | `prompt` | string, ≤32000 | — | **Required.** English works best. `list_models` reports `max_prompt_chars` per model (Qwen: 20000 characters and an estimated 4500-token limit, whichever is reached first). |
-| `model` | enum | `nano-banana-2-lite` | `nano-banana-2-lite` (cheapest Google default, 1024 only) · `nano-banana-2` (choose for 512, 2048 or 4096) · `nano-banana-pro` (top Google quality, up to 4K, no 512) · `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` (OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096; Flare is the fast tier, Sunburst the precision tier; they ignore `seed` and `relaxed_filter`; with references, omit `aspect_ratio` because output follows the first reference's orientation) · `qwen-image-3.0-pro` (Alibaba — crisp small text and dense layouts; 1024 or 2048 only, up to 3 references, `seed` and `negative_prompt`). Cheapest per image: `nano-banana-2-lite` at $0.03. |
-| `aspect_ratio` | enum | `1:1` | `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`. |
-| `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096`. 512 only on `nano-banana-2`; lite is 1024 only; `nano-banana-pro` and GPT Image have no 512; Qwen accepts 1024 or 2048. GPT Image renders 4096 at 3840 on the long side (8.3 MP cap). |
+| `model` | enum | `nano-banana-2-lite` | `nano-banana-2-lite` (cheapest Google default, 1024 only) · `nano-banana-2` (choose for 512, 2048 or 4096) · `nano-banana-2-1` (Nano Banana 2.1, Google's newest Flash image model: 1024, 2048 or 4096, no 512, panoramic aspect ratios, no `seed`) · `nano-banana-pro` (top Google quality, up to 4K, no 512) · `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` (OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096; Flare is the fast tier, Sunburst the precision tier; they ignore `seed` and `relaxed_filter`; with references, omit `aspect_ratio` because output follows the first reference's orientation) · `qwen-image-3.0-pro` (Alibaba — crisp small text and dense layouts; 1024 or 2048 only, up to 3 references, `seed` and `negative_prompt`). Cheapest per image: `nano-banana-2-lite` at $0.03. |
+| `aspect_ratio` | enum | `1:1` | `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9` on every model; panoramic `1:4`, `4:1`, `1:8`, `8:1`, `9:21` only on `nano-banana-2-1` (other models reject them before charging). `list_models` lists `aspect_ratios` per model. |
+| `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096`. 512 only on `nano-banana-2`; lite is 1024 only; `nano-banana-2-1`, `nano-banana-pro` and GPT Image have no 512; Qwen accepts 1024 or 2048. GPT Image renders 4096 at 3840 on the long side (8.3 MP cap). |
 | `number_of_images` | integer 1–4 | `1` | `>1` requires `confirm_cost`. |
 | `negative_prompt` | string, ≤1000 | — | What to avoid (Nano Banana and Qwen). |
 | `output_format` | enum | `jpeg` | `jpeg`, `png`, `webp`. |
-| `seed` | integer 0–2147483647 | — | For reproducible results (Nano Banana and Qwen; GPT Image ignores it). |
+| `seed` | integer 0–2147483647 | — | For reproducible results (Nano Banana and Qwen; GPT Image ignores it). `nano-banana-2-1` does not accept a seed — the call is rejected before charging. |
 | `reference_images` | string[], ≤14 | — | Visual references supplied as a completed image `job_id`, a public http(s) image URL, or an inline `data:image/png|jpeg|webp;base64,...` URL (≤10 MB each). A remote server cannot read a bare local filesystem path; encode a local file as a data URL. Qwen takes up to 3. This is also how GPT Image and Qwen edit a picture, since `edit_image` does not accept them. Google and Qwen honor `aspect_ratio` with references; GPT Image instead follows the first reference's orientation and rejects an explicit `aspect_ratio` before charging. |
 | `relaxed_filter` | boolean | `true` | Nano Banana only. Defaults to Google's permissive Vertex presets when a project key is available: configurable safety thresholds off and adult person generation allowed. Pass `false` to use the standard filter. An explicit `true` returns `SERVICE_UNAVAILABLE` before charging if no project key is free; the omitted default falls back to the standard filter and `get_result` reports `relaxed_filter: false`. The independent checks on input images and rendered output still apply; Celebrity refusals (support codes `15236754` / `29310472`) are unaffected. See [Content filtering](troubleshooting.md#content-filtering-and-relaxed_filter). |
 | `confirm_cost` | number | — | Required for batches: the quoted total USD you accept. |
@@ -215,7 +216,7 @@ the picture to `generate_image` as a reference instead.
 |---|---|---|---|
 | `source_generation_id` | string | — | **Required.** `job_id` of a **completed** image generation owned by this account. |
 | `prompt` | string, ≤32000 | — | **Required.** The edit instruction. |
-| `model` | enum | `nano-banana-2` | `nano-banana-2-lite`, `nano-banana-2`, `nano-banana-pro`. |
+| `model` | enum | `nano-banana-2` | `nano-banana-2-lite`, `nano-banana-2`, `nano-banana-2-1`, `nano-banana-pro`. |
 | `aspect_ratio` | enum | `1:1` | Same set as `generate_image`. |
 | `resolution` | enum | `1024` | `512`, `1024`, `2048`, `4096` (model constraints apply). |
 | `output_format` | enum | `jpeg` | `jpeg`, `png`, `webp`. |

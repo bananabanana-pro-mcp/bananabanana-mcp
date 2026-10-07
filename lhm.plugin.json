@@ -3,7 +3,7 @@
   "authorUrl": "https://github.com/bananabanana-pro-mcp",
   "category": "media-generate",
   "cloudEndpoint": "https://bananabanana.pro/api/mcp",
-  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.03, video from $0.09, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
+  "description": "Generate images, video and speech from any MCP client — Google Nano Banana 2 / 2.1 / Pro, OpenAI GPT Image 2.5, Alibaba Qwen Image 3.0 Pro, Veo 3.1, Gemini Omni Flash, Alibaba Wan 3.0, xAI Grok Imagine Video 1.5 and Gemini 3.1 Flash TTS. Pay-as-you-go from a prepaid balance topped up with crypto (from $1) or card / PayPal / SEPA (from $20), no subscription: images from $0.03, video from $0.09, speech from $0.01. Connect with OAuth 2.1 or an API key. Expensive calls return a cost quote before charging, and failed or content-filtered generations are refunded automatically.",
   "homepage": "https://github.com/bananabanana-pro-mcp/bananabanana-mcp",
   "icon": "https://bananabanana.pro/mcp-icon-512.png",
   "identifier": "bananabanana-pro-mcp-bananabanana-mcp",
@@ -52,7 +52,7 @@
     },
     {
       "name": "generate_image",
-      "description": "Start an AI image generation (Google Nano Banana family, OpenAI GPT Image 2.5, Alibaba Qwen-Image 3.0 Pro). Charges the account balance immediately and returns a job_id — poll get_result for the finished image URLs. Typical completion: 10–60 seconds. The default nano-banana-2-lite model is the cheapest Google option and produces 1024px images; choose nano-banana-2 explicitly for 512px, 2048px or 4096px output. Optional reference_images provide the model with the actual subject, product, character or style pixels; Nano Banana Pro supports up to 14 references (per-model limits in list_models). Costs $0.03–$0.20 per image depending on model and resolution (see list_models). Failed generations are automatically refunded. relaxed_filter is true by default for Google images; pass false to opt out. Non-configurable checks still apply. Generating several images at once (number_of_images > 1) is a batch: the first call returns a price quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to start. Example: {\"prompt\": \"studio photo of a ceramic mug on linen, soft daylight\", \"model\": \"nano-banana-2-lite\", \"aspect_ratio\": \"4:5\", \"resolution\": \"1024\"}",
+      "description": "Start an AI image generation (Google Nano Banana family, OpenAI GPT Image 2.5, Alibaba Qwen-Image 3.0 Pro). Charges the account balance immediately and returns a job_id — poll get_result for the finished image URLs. Typical completion: 10–60 seconds. The default nano-banana-2-lite model is the cheapest Google option and produces 1024px images; choose nano-banana-2 explicitly for 512px, 2048px or 4096px output. Panoramic and banner formats (1:4, 4:1, 1:8, 8:1, 9:21) need nano-banana-2-1. Optional reference_images provide the model with the actual subject, product, character or style pixels; Nano Banana Pro supports up to 14 references (per-model limits in list_models). Costs $0.03–$0.20 per image depending on model and resolution (see list_models). Failed generations are automatically refunded. relaxed_filter is true by default for Google images; pass false to opt out. Non-configurable checks still apply. Generating several images at once (number_of_images > 1) is a batch: the first call returns a price quote and charges nothing — repeat the call with confirm_cost set to the quoted amount to start. Example: {\"prompt\": \"studio photo of a ceramic mug on linen, soft daylight\", \"model\": \"nano-banana-2-lite\", \"aspect_ratio\": \"4:5\", \"resolution\": \"1024\"}",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -66,13 +66,14 @@
             "enum": [
               "nano-banana-2-lite",
               "nano-banana-2",
+              "nano-banana-2-1",
               "nano-banana-pro",
               "gpt-image-2.5-flare",
               "gpt-image-2.5-sunburst",
               "qwen-image-3.0-pro"
             ],
             "default": "nano-banana-2-lite",
-            "description": "nano-banana-2-lite: cheapest Google default, 1024 only. nano-banana-2: choose for 512, 2048 or 4096 output. nano-banana-pro: top Google quality, up to 4K. gpt-image-2.5-flare / gpt-image-2.5-sunburst: OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096 (4K = 3840 on the long side); Flare is the fast 2.5 tier, Sunburst the precision tier; they ignore seed and relaxed_filter, and with reference_images they take the orientation of the first reference (omit aspect_ratio there, it is rejected). qwen-image-3.0-pro: Alibaba — crisp small text, dense layouts (posters, menus, UI); 1024 or 2048 only, up to 3 references, seed + negative_prompt. Cheapest per image: nano-banana-2-lite at $0.03."
+            "description": "nano-banana-2-lite: cheapest Google default, 1024 only. nano-banana-2: choose for 512, 2048 or 4096 output. nano-banana-2-1: Google's newest Flash image model — 1024, 2048 or 4096 (no 512), adds panoramic 1:4, 4:1, 1:8, 8:1 and 9:21 aspect ratios, no seed. nano-banana-pro: top Google quality, up to 4K. gpt-image-2.5-flare / gpt-image-2.5-sunburst: OpenAI — strongest at readable in-image text and long literal briefs; 1024, 2048 or 4096 (4K = 3840 on the long side); Flare is the fast 2.5 tier, Sunburst the precision tier; they ignore seed and relaxed_filter, and with reference_images they take the orientation of the first reference (omit aspect_ratio there, it is rejected). qwen-image-3.0-pro: Alibaba — crisp small text, dense layouts (posters, menus, UI); 1024 or 2048 only, up to 3 references, seed + negative_prompt. Cheapest per image: nano-banana-2-lite at $0.03."
           },
           "aspect_ratio": {
             "type": "string",
@@ -86,9 +87,15 @@
               "5:4",
               "9:16",
               "16:9",
-              "21:9"
+              "21:9",
+              "1:4",
+              "4:1",
+              "1:8",
+              "8:1",
+              "9:21"
             ],
-            "default": "1:1"
+            "default": "1:1",
+            "description": "Panoramic 1:4, 4:1, 1:8, 8:1, 9:21 are accepted only by nano-banana-2-1; every other model takes the standard ten (list_models shows aspect_ratios per model)."
           },
           "resolution": {
             "type": "string",
@@ -99,7 +106,7 @@
               "4096"
             ],
             "default": "1024",
-            "description": "Lite requires 1024. Choose nano-banana-2 for 512, 2048 or 4096; 4096 costs the most. GPT Image models have no 512; qwen-image-3.0-pro accepts 1024 or 2048 only."
+            "description": "Lite requires 1024. Choose nano-banana-2 for 512, 2048 or 4096; 4096 costs the most. nano-banana-2-1, nano-banana-pro and GPT Image models have no 512; qwen-image-3.0-pro accepts 1024 or 2048 only."
           },
           "number_of_images": {
             "type": "integer",
@@ -125,7 +132,7 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 2147483647,
-            "description": "For reproducible results."
+            "description": "For reproducible results. nano-banana-2-1 does not accept seed (the call is rejected); GPT Image models ignore it."
           },
           "reference_images": {
             "type": "array",
@@ -158,7 +165,7 @@
     },
     {
       "name": "edit_image",
-      "description": "Edit / refine a previously generated image with a text instruction on Nano Banana 2 Lite / 2 / Pro (multi-turn editing: change colors, remove objects, restyle, etc.). This tool modifies an image that already exists — use generate_image to create a new image from a prompt. Pass the job_id of a COMPLETED image generation as source_generation_id. Charged like a single image of the chosen model/resolution; auto-refund on failure. Example: {\"source_generation_id\": \"cmxyz...\", \"prompt\": \"make the background pure white and add soft shadow\"}",
+      "description": "Edit / refine a previously generated image with a text instruction on Nano Banana 2 Lite / 2 / 2.1 / Pro (multi-turn editing: change colors, remove objects, restyle, etc.). This tool modifies an image that already exists — use generate_image to create a new image from a prompt. Pass the job_id of a COMPLETED image generation as source_generation_id. Charged like a single image of the chosen model/resolution; auto-refund on failure. Example: {\"source_generation_id\": \"cmxyz...\", \"prompt\": \"make the background pure white and add soft shadow\"}",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -176,6 +183,7 @@
             "enum": [
               "nano-banana-2-lite",
               "nano-banana-2",
+              "nano-banana-2-1",
               "nano-banana-pro"
             ],
             "default": "nano-banana-2"
@@ -192,9 +200,15 @@
               "5:4",
               "9:16",
               "16:9",
-              "21:9"
+              "21:9",
+              "1:4",
+              "4:1",
+              "1:8",
+              "8:1",
+              "9:21"
             ],
-            "default": "1:1"
+            "default": "1:1",
+            "description": "Panoramic ratios (1:4, 4:1, 1:8, 8:1, 9:21) only on nano-banana-2-1."
           },
           "resolution": {
             "type": "string",
@@ -218,7 +232,8 @@
           "seed": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 2147483647
+            "maximum": 2147483647,
+            "description": "Not accepted by nano-banana-2-1."
           },
           "relaxed_filter": {
             "type": "boolean",
@@ -660,5 +675,5 @@
       }
     }
   ],
-  "version": "1.0.12"
+  "version": "1.0.13"
 }

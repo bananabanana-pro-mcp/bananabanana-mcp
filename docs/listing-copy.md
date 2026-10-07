@@ -30,7 +30,7 @@ remote Streamable HTTP MCP servers.
 
 Unlike a thin wrapper around a single Gemini API, BananaBanana does not require the
 user to install a runtime or supply a vendor API key. It provides one hosted endpoint
-for six image models (Nano Banana 2 Lite / 2 / Pro, GPT Image 2.5 Flare / Sunburst,
+for seven image models (Nano Banana 2 Lite / 2 / 2.1 / Pro, GPT Image 2.5 Flare / Sunburst,
 Qwen Image 3.0 Pro), seven video models (Veo 3.1 / Fast / Lite, Gemini Omni 1.1 Flash
 and Omni Flash 1.0, Wan 3.0, Grok Imagine Video 1.5) with video-to-video editing and
 scene extension, and Gemini TTS. The service also owns the account balance, exact
@@ -70,6 +70,7 @@ expose the full profile or promo-code controls.
 |---|---:|
 | `nano-banana-2-lite` | $0.03 at 1024 |
 | `nano-banana-2` | $0.03 at 512; $0.06 at 1024; $0.09 at 2048; $0.13 at 4096 |
+| `nano-banana-2-1` | $0.03 at 1024; $0.05 at 2048; $0.10 at 4096 (panoramic up to 8:1) |
 | `nano-banana-pro` | $0.11 at 1024 or 2048; $0.20 at 4096 |
 | `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | $0.05 at 1024; $0.11 at 2048; $0.18 at 4096 (OpenAI's own list price) |
 | `qwen-image-3.0-pro` | $0.04 at 1024; $0.08 at 2048 |
@@ -332,7 +333,7 @@ by insufficient balance or an optional daily spend cap.
 
 ## Release and catalogue versions
 
-The current documentation release and official Registry version are **1.0.12**
+The current documentation release and official Registry version are **1.0.13**
 (2026-09-30). GitHub’s Latest release must be updated when a new version is
 published; pushing `main` or publishing the MCP Registry does not update it.
 Generated media is retained for 30 days from creation, with 24-hour signed URLs.

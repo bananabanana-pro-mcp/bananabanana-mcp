@@ -136,7 +136,7 @@ Ten tools; the read-only and account-access tools are free. Full reference in
 | `list_models` | List models with live USD prices, resolutions, durations, constraints. Free. | — |
 | `get_account` | Balance, key name, daily cap, spend today. Free. | — |
 | `top_up` | Return a balance top-up link (crypto or card). OAuth gets a one-time deposit-only link; API-key users get the profile URL. Free. | — |
-| `generate_image` | Text-to-image on Nano Banana 2 Lite / 2 / Pro, GPT Image 2.5 Flare / Sunburst or Qwen Image 3.0 Pro, up to 4K, 1–4 variants, up to 14 reference images. Lite is the default; Google images use `relaxed_filter: true` by default when a project key is free. GPT Image with references follows the first image's orientation and rejects an explicit `aspect_ratio`. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `reference_images`, `relaxed_filter`, `confirm_cost` |
+| `generate_image` | Text-to-image on Nano Banana 2 Lite / 2 / 2.1 / Pro, GPT Image 2.5 Flare / Sunburst or Qwen Image 3.0 Pro, up to 4K, 1–4 variants, up to 14 reference images. Lite is the default; Google images use `relaxed_filter: true` by default when a project key is free. GPT Image with references follows the first image's orientation and rejects an explicit `aspect_ratio`. Panoramic `1:4`, `4:1`, `1:8`, `8:1`, `9:21` only on `nano-banana-2-1`. Returns a `job_id`. | `prompt`, `model`, `aspect_ratio`, `resolution`, `number_of_images`, `reference_images`, `relaxed_filter`, `confirm_cost` |
 | `edit_image` | Multi-turn edit of a finished image by text instruction (Nano Banana models). | `source_generation_id`, `prompt`, `model`, `resolution` |
 | `generate_video` | Video on Veo 3.1 family, Gemini Omni Flash (1.1 or 1.0), Wan 3.0 or Grok Imagine Video 1.5, optionally from a first frame, a last frame, reference images or (Wan) reference videos. Always quotes first. Returns a `job_id`. | `prompt`, `model`, `duration`, `resolution`, `aspect_ratio`, `with_audio`, `first_frame`, `last_frame`, `reference_images`, `reference_videos`, `confirm_cost` |
 | `edit_video` | Video-to-video: restyle, replace objects or relight an existing clip on Omni Flash, extend an Omni clip by 3–10 s (up to 40 s total), or rework / continue a clip on Wan 3.0. Always quotes first. | `prompt`, `model`, `source_generation_id` or `video_url`, `mode`, `duration`, `resolution`, `audio_prompt`, `confirm_cost` |
@@ -164,6 +164,7 @@ Live numbers come from `list_models`; full tables in [`docs/pricing.md`](./docs/
 |---|---|---|
 | `nano-banana-2-lite` | Image (1024) | $0.03 |
 | `nano-banana-2` | Image (512→4096) | $0.03 – $0.13 |
+| `nano-banana-2-1` | Image (1024→4096, panoramic up to 8:1) | $0.03 – $0.10 |
 | `nano-banana-pro` | Image (1024→4096) | $0.11 – $0.20 |
 | `gpt-image-2.5-flare` / `gpt-image-2.5-sunburst` | Image (1024→4096, OpenAI) | $0.05 – $0.18 |
 | `qwen-image-3.0-pro` | Image (1024/2048, Alibaba) | $0.04 – $0.08 |

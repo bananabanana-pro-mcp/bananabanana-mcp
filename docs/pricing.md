@@ -48,17 +48,20 @@ effective out-of-pocket price can be lower.
 |---|---|---|---|---|---|
 | `nano-banana-2-lite` | Google | — | $0.03 | — | — |
 | `nano-banana-2` | Google | $0.03 | $0.06 | $0.09 | $0.13 |
+| `nano-banana-2-1` | Google | — | $0.03 | $0.05 | $0.10 |
 | `nano-banana-pro` | Google | — | $0.11 | $0.11 | $0.20 |
 | `gpt-image-2.5-flare` | OpenAI | — | $0.05 | $0.11 | $0.18 |
 | `gpt-image-2.5-sunburst` | OpenAI | — | $0.05 | $0.11 | $0.18 |
 | `qwen-image-3.0-pro` | Alibaba | — | $0.04 | $0.08 | — |
 
-`nano-banana-2-lite` supports 1024 only. `nano-banana-pro` and the GPT Image models
+`nano-banana-2-lite` supports 1024 only. `nano-banana-2-1`, `nano-banana-pro` and the GPT Image models
 have no 512; `qwen-image-3.0-pro` accepts 1024 or 2048 only. GPT Image renders 1024 at
 about 1.5 MP and 2048 / 4096 at the exact requested size (4K = 3840 on the long side,
 8.3 MP cap). `generate_image` defaults to `nano-banana-2-lite`; choose `nano-banana-2`
 explicitly for 512, 2048 or 4096 output. Every image model accepts `reference_images`
-(up to 14; Qwen up to 3).
+(up to 14; Qwen up to 3). `nano-banana-2-1` (Nano Banana 2.1, Google's newest Flash image
+model) is the only one with panoramic aspect ratios — `1:4`, `4:1`, `1:8`, `8:1`, `9:21` on top
+of the standard ten — and it does not accept `seed`.
 
 **Editing** (`edit_image`) runs on the Nano Banana models only and costs the same as
 generating one image of the chosen model and resolution. GPT Image and Qwen do not
